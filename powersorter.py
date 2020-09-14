@@ -6,6 +6,8 @@ import os
 def scan_files(path=None, pattern=None):
     """
     Scan the directory for files matching the provided pattern.
+    Extract relevant parts from file for organization and sorting
+    Return a list of matching files
     """
     #print(path)
     # TODO use Path Lib to split path and file name
@@ -14,6 +16,7 @@ def scan_files(path=None, pattern=None):
     #test_files = ['BRIT1000.jpg', 'BRIT1000.JPG', 'BRIT1000.JPEG', 'BRIT1000_med.jpg', 'BRIT1000_thumb.jpg', 'BRIT1000.DNG', 'BRIT1000.cr2', 'BRIT1000.nef', 'BRIT1000_ocr.txt', 'BRIT1000_ocr.json' ]
     #print('test_files:', test_files)
 
+    matches = []
     print(pattern)
     file_pattern = re.compile(pattern)
     for root, dirs, files in os.walk(path):
@@ -23,30 +26,18 @@ def scan_files(path=None, pattern=None):
             if m:
                 print('file:', file)
                 print(m.groups())
-                group_dict = m.groupdict()
-                print('prefix:', group_dict.get('prefix'))
-                print('numerical:', group_dict.get('numerical'))
-                print('delimiter:', group_dict.get('delimiter'))
-                print('size:', group_dict.get('size'))
-                print('ext:', group_dict.get('ext'))
+                file_dict = m.groupdict()
+                print('prefix:', file_dict.get('prefix'))
+                print('numerical:', file_dict.get('numerical'))
+                print('delimiter:', file_dict.get('delimiter'))
+                print('size:', file_dict.get('size'))
+                print('ext:', file_dict.get('ext'))
+                file_path = os.path.join(root, file)
+                file_dict['file_path'] = file_path
+                matches.append(file_dict)
+    return matches
 
-    """
-    match_list = []
-    for key, extension in extensions:
-        ext_pattern = '*.' + extension
-        # Scan for files
-        print('Scanning directory:', source_directory_path, 'for files matching', ext_pattern)
-        if recurse_subdirectories:
-            # Using rglob
-            path_matches = source_directory_path.rglob(ext_pattern)
-        else:
-            # Using glob
-            path_matches = source_directory_path.glob(ext_pattern)
-        match_list.append(path_matches)
-
-    all_matches = itertools.chain(*match_list)
-    return all_matches
-    """
+#def sort_files(path_matches=None, output_path=None):
 
 
 # load config file
@@ -66,8 +57,8 @@ for file_type, value in file_types.items():
     destination_path = value.get('destination_path', None)
     # test input_path
     input_path = './input_dir/'
-    scan_files(path=input_path, pattern=regex)
-    # test pattern
-    #scan_files(path=input_path, pattern='(?P<prefix>BRIT)(\d+)(\.)(JPG|jpeg)')
+    file_matches = scan_files(path=input_path, pattern=regex)
+    print(file_matches)
+
     # TODO confirm destination_path exists and is writable
 
