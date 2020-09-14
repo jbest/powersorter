@@ -18,6 +18,7 @@ def scan_files(path=None, pattern=None):
         if m:
             print('file:', file)
             print(m.groups())
+            print('groupdict', m.groupdict())
             print('prefix:', m.group('prefix'))
             print(m.group('numerical'))
             #print(m.group('delimiter'))
