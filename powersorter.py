@@ -2,6 +2,7 @@ import json
 import re
 import os
 from pathlib import Path
+import shutil
 
 
 def scan_files(path=None, pattern=None):
@@ -61,25 +62,44 @@ print('collection_prefix:', collection_prefix)
 files = config.get('files', None)
 folder_increment = int(files.get('folder_increment', 1000))
 number_pad = int(files.get('number_pad', 7))
-output_base_path = files['output_base_path']
-output_base_path = Path(output_base_path)
-input_path = files['input_path']
+output_base_path = Path(files.get('output_base_path', None))
+input_path = Path(files.get('input_path', None))
 print('input_path:', input_path)
 # TODO confirm input_path exists and is readable
 
+# Check existence of input path
+if input_path:
+    # test to ensure input directory exists
+    if input_path.is_dir():
+        print('input_path:', input_path)
+    else:
+        print(f'ERROR: directory {input_path} does not exist.')
+        print('Terminating script.')
+        quit()
+
 file_types = config.get('file_types', None)
+
+# TODO check ALL output directories before scanning for files
+"""
+# Check ability to write to X directory
+if not os.access(output_path, os.W_OK | os.X_OK):
+    print(f'Unable to write to directory: {output_path}')
+    quit()
+"""
+
+# scan, sort, and move each file type
 for file_type, value in file_types.items():
     regex = value.get('regex', None)
     output_sub_path = value.get('output_sub_path', None)
-    # TODO join output_base_path with output_path
     # TODO confirm destination_path exists and is writable
     print('output_sub_path:', output_sub_path)
     output_path = output_base_path.joinpath(output_sub_path)
-    # test input_path
-    input_path = './input_dir/'
-    file_matches = scan_files(path=input_path, pattern=regex)
-    #print(file_matches)
-    sort_files(files=file_matches, output_path=output_path)
+    # Check ability to write to X directory
+    if not os.access(output_path, os.W_OK | os.X_OK):
+        print(f'Unable to write to directory: {output_path}')
+    else:
+        file_matches = scan_files(path=input_path, pattern=regex)
+        sort_files(files=file_matches, output_path=output_path)
 
     
 
