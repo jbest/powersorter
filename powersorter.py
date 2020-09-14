@@ -1,5 +1,6 @@
 import json
 import re
+import os
 
 
 def scan_files(path=None, pattern=None):
@@ -7,23 +8,27 @@ def scan_files(path=None, pattern=None):
     Scan the directory for files matching the provided pattern.
     """
     #print(path)
+    # TODO use Path Lib to split path and file name
 
     # Test file names
-    test_files = ['BRIT1000.jpg', 'BRIT1000.JPG', 'BRIT1000.JPEG', 'BRIT1000_med.jpg', 'BRIT1000_thumb.jpg', 'BRIT1000.DNG', 'BRIT1000.cr2', 'BRIT1000.nef', 'BRIT1000_ocr.txt', 'BRIT1000_ocr.json' ]
-    print(pattern)
+    #test_files = ['BRIT1000.jpg', 'BRIT1000.JPG', 'BRIT1000.JPEG', 'BRIT1000_med.jpg', 'BRIT1000_thumb.jpg', 'BRIT1000.DNG', 'BRIT1000.cr2', 'BRIT1000.nef', 'BRIT1000_ocr.txt', 'BRIT1000_ocr.json' ]
     #print('test_files:', test_files)
+
+    print(pattern)
     file_pattern = re.compile(pattern)
-    for file in test_files:
-        m = file_pattern.match(file)
-        if m:
-            print('file:', file)
-            print(m.groups())
-            print('groupdict', m.groupdict())
-            print('prefix:', m.group('prefix'))
-            print(m.group('numerical'))
-            #print(m.group('delimiter'))
-            #print(m.group('size'))
-            print(m.group('ext'))
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            #print(os.path.join(root, file))
+            m = file_pattern.match(file)
+            if m:
+                print('file:', file)
+                print(m.groups())
+                group_dict = m.groupdict()
+                print('prefix:', group_dict.get('prefix'))
+                print('numerical:', group_dict.get('numerical'))
+                print('delimiter:', group_dict.get('delimiter'))
+                print('size:', group_dict.get('size'))
+                print('ext:', group_dict.get('ext'))
 
     """
     match_list = []
@@ -59,6 +64,8 @@ file_types = config.get('file_types', None)
 for file_type, value in file_types.items():
     regex = value.get('regex', None)
     destination_path = value.get('destination_path', None)
+    # test input_path
+    input_path = './input_dir/'
     scan_files(path=input_path, pattern=regex)
     # test pattern
     #scan_files(path=input_path, pattern='(?P<prefix>BRIT)(\d+)(\.)(JPG|jpeg)')
