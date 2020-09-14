@@ -7,9 +7,22 @@ def scan_files(path=None, pattern=None):
     Scan the directory for files matching the provided pattern.
     """
     #print(path)
+
+    # Test file names
+    test_files = ['BRIT1000.jpg', 'BRIT1000.JPG', 'BRIT1000.JPEG', 'BRIT1000_med.jpg', 'BRIT1000_thumb.jpg', 'BRIT1000.DNG', 'BRIT1000.cr2', 'BRIT1000.nef', 'BRIT1000_ocr.txt', 'BRIT1000_ocr.json' ]
     print(pattern)
+    #print('test_files:', test_files)
     file_pattern = re.compile(pattern)
-    print(file_pattern.match('BRIT1000.JPG'))
+    for file in test_files:
+        m = file_pattern.match(file)
+        if m:
+            print('file:', file)
+            print(m.groups())
+            print('prefix:', m.group('prefix'))
+            print(m.group('numerical'))
+            #print(m.group('delimiter'))
+            #print(m.group('size'))
+            print(m.group('ext'))
 
     """
     match_list = []
