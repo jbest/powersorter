@@ -8,8 +8,8 @@ collection['prefix'] = 'BRIT'
 files = config['files'] = {}
 files['folder_increment'] = 1000
 files['number_pad'] = 7
-files['output_base_path'] = '/test/out/'
-files['input_path'] = '/test/in/'
+files['output_base_path'] = '/Users/jbest/Documents/brit-svn/git/powersorter/'
+files['input_path'] = '/Users/jbest/Documents/brit-svn/git/powersorter/input_dir/'
 
 # file_types
 file_types = config['file_types'] = {}
