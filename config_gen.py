@@ -16,15 +16,15 @@ file_types = config['file_types'] = {}
 # TODO create a pattern class to generate each patterns
 # TODO use regex to test compile the pattern, maybe to test?
 web_jpg = file_types['web_jpg'] = {}
-web_jpg['regex'] = '(?<prefix>BRIT)(?<numerical>\d+)(\.)(?i)(?<ext>jpg|jpeg)'
+web_jpg['regex'] = '(?P<prefix>BRIT)(?P<numerical>\d+)(\.)(?i)(?P<ext>jpg|jpeg)'
 web_jpg['destination_path'] = 'web/'
 
 web_derivs = file_types['web_derivs'] = {}
-web_derivs['regex'] = '(?<prefix>BRIT)(?<numerical>\d+)(?<delimiter>_)(?<size>med|thumb)(\.)(?<ext>.+)'
+web_derivs['regex'] = '(?P<prefix>BRIT)(?P<numerical>\d+)(?P<delimiter>_)(?P<size>med|thumb)(\.)(?P<ext>.+)'
 web_derivs['destination_path'] = 'web/'
 
 archive_dng = file_types['archive_dng'] = {}
-archive_dng['regex'] = '(?<prefix>BRIT)(?<numerical>\d+)(\.)(?i)(?<ext>DNG)'
+archive_dng['regex'] = '(?P<prefix>BRIT)(?P<numerical>\d+)(\.)(?i)(?P<ext>DNG)'
 archive_dng['destination_path'] = 'archive/'
 
 #print(config)
