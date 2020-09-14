@@ -11,15 +11,15 @@
   },
   "file_types": {
     "web_jpg": {
-      "regex": "(?<prefix>BRIT)(?<numerical>\\d+)(\\.)(?i)(?<ext>jpg|jpeg)",
+      "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>jpg|jpeg)",
       "destination_path": "web/"
     },
     "web_derivs": {
-      "regex": "(?<prefix>BRIT)(?<numerical>\\d+)(?<delimiter>_)(?<size>med|thumb)(\\.)(?<ext>.+)",
+      "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(?P<delimiter>_)(?P<size>med|thumb)(\\.)(?P<ext>.+)",
       "destination_path": "web/"
     },
     "archive_dng": {
-      "regex": "(?<prefix>BRIT)(?<numerical>\\d+)(\\.)(?i)(?<ext>DNG)",
+      "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>DNG)",
       "destination_path": "archive/"
     }
   }
