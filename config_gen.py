@@ -31,4 +31,4 @@ ocr = file_types['ocr'] = {}
 ocr['regex'] = '(?P<prefix>BRIT)(?P<numerical>\d+)(?P<delimiter>_)(?P<ocr>ocr)(\.)(?P<ext>.+)'
 ocr['output_sub_path'] = 'web/'
 
-print(json.dumps(config))
+print(json.dumps(config, indent=4))
