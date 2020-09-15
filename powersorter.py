@@ -80,10 +80,8 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
     if destination.exists():
         if dry_run:
             now = datetime.datetime.now()
-            """
             writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
                 'filetype': filetype, 'source': source, 'destination': destination})
-            """
         if verbose:
             print('Filename exists, cannot move:', destination)
         #TODO change to exception
@@ -91,10 +89,8 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
         status = 'fail'
         details = 'filename exists'
         now = datetime.datetime.now()
-        """
         writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
             'filetype': filetype, 'source': source, 'destination': destination})
-        """
         return {'move_success': move_success, 'status': status}
     else:
         if dry_run:
@@ -102,10 +98,8 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             status = 'DRY-RUN - simulated move'
             move_success = True
             now = datetime.datetime.now()
-            """
             writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
                 'filetype': filetype, 'source': source, 'destination': destination})
-            """
         else:
             # Create directory path if it doesn't exist
             destination_directory.mkdir(parents=True, exist_ok=True)
@@ -120,11 +114,9 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                 details = 'PermissionError'
                 move_success = False
             now = datetime.datetime.now()
-            """
             writer.writerow({'timestamp': now, 'username': username, \
                 'action': 'move', 'result': status, 'details': details, \
                 'filetype': filetype, 'source': source, 'destination': destination})
-            """
             if verbose:
                 print('Move:', destination, status)
                
