@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import shutil
 import datetime
-
+import csv
 
 def scan_files(path=None, pattern=None):
     """
@@ -156,6 +156,8 @@ if input_path:
         quit()
 
 file_types = config.get('file_types', None)
+# TEST
+log_file_path = 'test.csv'
 
 # TODO check ALL output directories before scanning for files
 """
@@ -164,19 +166,23 @@ if not os.access(output_path, os.W_OK | os.X_OK):
     print(f'Unable to write to directory: {output_path}')
     quit()
 """
+with open(log_file_path, 'w', newline='') as csvfile:
+    fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
 
-# scan, sort, and move each file type
-for file_type, value in file_types.items():
-    regex = value.get('regex', None)
-    output_sub_path = value.get('output_sub_path', None)
-    print('output_sub_path:', output_sub_path)
-    output_path = output_base_path.joinpath(output_sub_path)
-    # Check ability to write to directory
-    if not os.access(output_path, os.W_OK | os.X_OK):
-        print(f'Unable to write to directory: {output_path}')
-    else:
-        file_matches = scan_files(path=input_path, pattern=regex)
-        sort_files(files=file_matches, output_path=output_path)
+    # scan, sort, and move each file type
+    for file_type, value in file_types.items():
+        regex = value.get('regex', None)
+        output_sub_path = value.get('output_sub_path', None)
+        print('output_sub_path:', output_sub_path)
+        output_path = output_base_path.joinpath(output_sub_path)
+        # Check ability to write to directory
+        if not os.access(output_path, os.W_OK | os.X_OK):
+            print(f'Unable to write to directory: {output_path}')
+        else:
+            file_matches = scan_files(path=input_path, pattern=regex)
+            sort_files(files=file_matches, output_path=output_path)
 
     
 
