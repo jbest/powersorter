@@ -6,6 +6,7 @@ import shutil
 import datetime
 import csv
 import pwd
+import argparse
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -13,12 +14,7 @@ def scan_files(path=None, pattern=None, file_type=None):
     Extract relevant parts from file for organization and sorting
     Return a list of matching files
     """
-    #print(path)
     # TODO use Path Lib to split path and file name
-
-    # Test file names
-    #test_files = ['BRIT1000.jpg', 'BRIT1000.JPG', 'BRIT1000.JPEG', 'BRIT1000_med.jpg', 'BRIT1000_thumb.jpg', 'BRIT1000.DNG', 'BRIT1000.cr2', 'BRIT1000.nef', 'BRIT1000_ocr.txt', 'BRIT1000_ocr.json' ]
-    #print('test_files:', test_files)
 
     matches = []
     print('pattern:', pattern)
@@ -29,13 +25,6 @@ def scan_files(path=None, pattern=None, file_type=None):
             m = file_pattern.match(file)
             if m:
                 file_dict = m.groupdict()
-                """
-                print('prefix:', file_dict.get('prefix'))
-                print('numerical:', file_dict.get('numerical'))
-                print('delimiter:', file_dict.get('delimiter'))
-                print('size:', file_dict.get('size'))
-                print('ext:', file_dict.get('ext'))
-                """
                 file_path = os.path.join(root, file)
                 file_dict['file_path'] = file_path
                 file_dict['file_type'] = file_type
@@ -43,10 +32,9 @@ def scan_files(path=None, pattern=None, file_type=None):
     return matches
 
 def sort_files(files=None, output_path=None):
-    # TEST
-    dry_run = True
+    sorted_file_count = 0
+    unmoved_file_count = 0    
     for file in files:
-        print(file)
         file_path = Path(file['file_path'])
         file_type = file['file_type']
         basename = file_path.name
@@ -57,19 +45,19 @@ def sort_files(files=None, output_path=None):
         padded_folder_number = str(folder_number).zfill(number_pad)
         destination_folder_name = collection_prefix + padded_folder_number
         destination_path = Path(output_path).joinpath(destination_folder_name)
-        print(destination_path)
         move_result = move_file(source=file_path, \
             destination_directory=destination_path, \
             filename=basename, \
             filetype=file_type, \
             )
         if move_result['move_success']:
-            #sorted_file_count +=1
-            pass
+            sorted_file_count +=1
         else:
-            #unmoved_file_count +=1
-            pass
-
+            unmoved_file_count +=1
+    return {
+        'sorted_file_count': sorted_file_count, \
+        'unmoved_file_count': unmoved_file_count, \
+        }
 
 
 def move_file(source=None, destination_directory=None, filename=None, filetype=None):
@@ -108,7 +96,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             destination_directory.mkdir(parents=True, exist_ok=True)
             #TODO Log creation of directory? If so, will need to force exception and only log when no exception
             try:
-                #shutil.move(source, destination)
+                shutil.move(source, destination)
                 status = 'success'
                 details = None
                 move_success = True
@@ -125,8 +113,29 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                
         return {'move_success': move_success, 'status': status}
 
+
+# TODO Make dry run more useful - make it test destination perms and perms for each file to be moved
+
+# set up argument parser
+ap = argparse.ArgumentParser()
+ap.add_argument("-c", "--config", required=True, \
+    help="Path to the configuration file to be used for processing images.")
+ap.add_argument("-s", "--source", required=False, \
+    help="Source directory - overrides source in config file")
+ap.add_argument("-v", "--verbose", action="store_true", \
+    help="Detailed output.")
+ap.add_argument("-n", "--dry_run", action="store_true", \
+    help="Simulate the sort process without moving files or creating directories.")
+args = vars(ap.parse_args())
+
+print(args)
+
+config_file = args["config"]
+dry_run = args["dry_run"]
+verbose = args["verbose"]
+
 # load config file
-with open('test.json') as f:
+with open(config_file) as f:
     config = json.load(f)
 
 collection = config.get('collection', None)
@@ -134,6 +143,7 @@ collection_prefix = collection.get('prefix', None)
 print('collection_prefix:', collection_prefix)
 files = config.get('files', None)
 folder_increment = int(files.get('folder_increment', 1000))
+log_directory_path = Path(files.get('log_directory_path', None))
 number_pad = int(files.get('number_pad', 7))
 output_base_path = Path(files.get('output_base_path', None))
 input_path = Path(files.get('input_path', None))
@@ -151,8 +161,8 @@ if input_path:
         quit()
 
 file_types = config.get('file_types', None)
-# TEST
-log_file_path = 'test.csv'
+# TODO dynamicaly generate file name with herb code and timestamp
+log_file_path = log_directory_path.joinpath('log.csv')
 
 try:
     username = pwd.getpwuid(os.getuid()).pw_name
@@ -173,6 +183,8 @@ with open(log_file_path, 'w', newline='') as csvfile:
     writer.writeheader()
 
     # scan, sort, and move each file type
+    sorted_file_count = 0
+    unmoved_file_count = 0 # files matching pattern, but not moved/sorted
     for file_type, value in file_types.items():
         regex = value.get('regex', None)
         output_sub_path = value.get('output_sub_path', None)
@@ -183,7 +195,16 @@ with open(log_file_path, 'w', newline='') as csvfile:
             print(f'Unable to write to directory: {output_path}')
         else:
             file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
-            sort_files(files=file_matches, output_path=output_path)
+            sort_result = sort_files(files=file_matches, output_path=output_path)
+            sorted_file_count += sort_result.get('sorted_file_count', 0)
+            unmoved_file_count += sort_result.get('unmoved_file_count', 0)
+
+
+# Summary report
+print('SORT COMPLETE')
+print('Log file written to:', log_file_path)
+print('sorted_file_count', sorted_file_count)
+print('unmoved_file_count', unmoved_file_count)
 
     
 
