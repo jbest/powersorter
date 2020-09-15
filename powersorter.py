@@ -91,10 +91,9 @@ if not os.access(output_path, os.W_OK | os.X_OK):
 for file_type, value in file_types.items():
     regex = value.get('regex', None)
     output_sub_path = value.get('output_sub_path', None)
-    # TODO confirm destination_path exists and is writable
     print('output_sub_path:', output_sub_path)
     output_path = output_base_path.joinpath(output_sub_path)
-    # Check ability to write to X directory
+    # Check ability to write to directory
     if not os.access(output_path, os.W_OK | os.X_OK):
         print(f'Unable to write to directory: {output_path}')
     else:
