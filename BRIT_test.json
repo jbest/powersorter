@@ -8,7 +8,7 @@
         "number_pad": 7,
         "log_directory_path": "/corral-repl/projects/TORCH/archive/BRIT/logs/test/",
         "output_base_path": "/corral-repl/projects/TORCH/",
-        "input_path": "/corral-repl/projects/TORCH/test/"
+        "input_path": "/corral-repl/projects/TORCH/test/powersorter/input_dir/"
     },
     "file_types": {
         "web_jpg": {
