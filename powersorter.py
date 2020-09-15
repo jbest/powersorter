@@ -7,7 +7,7 @@ import datetime
 import csv
 import pwd
 
-def scan_files(path=None, pattern=None):
+def scan_files(path=None, pattern=None, file_type=None):
     """
     Scan the directory for files matching the provided pattern.
     Extract relevant parts from file for organization and sorting
@@ -38,6 +38,7 @@ def scan_files(path=None, pattern=None):
                 """
                 file_path = os.path.join(root, file)
                 file_dict['file_path'] = file_path
+                file_dict['file_type'] = file_type
                 matches.append(file_dict)
     return matches
 
@@ -45,9 +46,11 @@ def sort_files(files=None, output_path=None):
     # TEST
     dry_run = True
     for file in files:
+        print(file)
         file_path = Path(file['file_path'])
+        file_type = file['file_type']
         basename = file_path.name
-        print(f'File {file_path} will be sorted to {output_path}')
+        #print(f'File {file_path} will be sorted to {output_path}')
         accession_number = int(file['numerical'])
         # Determine what folder number the files should be moved to
         folder_number = int(accession_number//folder_increment*folder_increment)
@@ -55,11 +58,10 @@ def sort_files(files=None, output_path=None):
         destination_folder_name = collection_prefix + padded_folder_number
         destination_path = Path(output_path).joinpath(destination_folder_name)
         print(destination_path)
-        filetype = 'TEST'
         move_result = move_file(source=file_path, \
             destination_directory=destination_path, \
             filename=basename, \
-            filetype=filetype, \
+            filetype=file_type, \
             )
         if move_result['move_success']:
             #sorted_file_count +=1
@@ -180,7 +182,7 @@ with open(log_file_path, 'w', newline='') as csvfile:
         if not os.access(output_path, os.W_OK | os.X_OK):
             print(f'Unable to write to directory: {output_path}')
         else:
-            file_matches = scan_files(path=input_path, pattern=regex)
+            file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
             sort_files(files=file_matches, output_path=output_path)
 
     
