@@ -8,9 +8,9 @@ collection['prefix'] = 'BRIT'
 files = config['files'] = {}
 files['folder_increment'] = 1000
 files['number_pad'] = 7
-files['log_directory_path'] = '/Users/jbest/Documents/brit-svn/git/powersorter/'
-files['output_base_path'] = '/Users/jbest/Documents/brit-svn/git/powersorter/'
-files['input_path'] = '/Users/jbest/Documents/brit-svn/git/powersorter/input_dir/'
+files['log_directory_path'] = '/corral-repl/projects/TORCH/archive/BRIT/logs/test/'
+files['output_base_path'] = '/corral-repl/projects/TORCH/'
+files['input_path'] = '/corral-repl/projects/TORCH/test/'
 
 # file_types
 file_types = config['file_types'] = {}
@@ -19,18 +19,18 @@ file_types = config['file_types'] = {}
 # NB - file_types key names are used by urlgen.py to determine which files have a URL generated.
 web_jpg = file_types['web_jpg'] = {}
 web_jpg['regex'] = r'(?P<prefix>BRIT)(?P<numerical>\d+)(\.)(?i)(?P<ext>jpg|jpeg)'
-web_jpg['output_sub_path'] = 'web/'
+web_jpg['output_sub_path'] = 'test/web/BRIT/'
 
 web_derivs = file_types['web_derivs'] = {}
 web_derivs['regex'] = r'(?P<prefix>BRIT)(?P<numerical>\d+)(?P<delimiter>_)(?P<size>med|thumb)(\.)(?P<ext>.+)'
-web_derivs['output_sub_path'] = 'web/'
+web_derivs['output_sub_path'] = 'test/web/BRIT/'
 
 archive_dng = file_types['archive_dng'] = {}
 archive_dng['regex'] = r'(?P<prefix>BRIT)(?P<numerical>\d+)(\.)(?i)(?P<ext>DNG)'
-archive_dng['output_sub_path'] = 'archive/'
+archive_dng['output_sub_path'] = 'test/archive/BRIT/'
 
 ocr = file_types['ocr'] = {}
 ocr['regex'] = r'(?P<prefix>BRIT)(?P<numerical>\d+)(?P<delimiter>_)(?P<ocr>ocr)(\.)(?P<ext>.+)'
-ocr['output_sub_path'] = 'web/'
+ocr['output_sub_path'] = 'test/web/BRIT/'
 
 print(json.dumps(config, indent=4))
