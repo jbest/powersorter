@@ -18,7 +18,7 @@ def scan_files(path=None, pattern=None, file_type=None):
     # TODO use Path Lib to split path and file name
 
     matches = []
-    print('pattern:', pattern)
+    #print('pattern:', pattern)
     file_pattern = re.compile(pattern)
     for root, dirs, files in os.walk(path):
         for file in files:
@@ -65,9 +65,6 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
     """
     Move files from the source to the destination directory.
     """
-    # Test
-    dry_run = False
-    verbose = True
     destination = destination_directory.joinpath(filename)
     if destination.exists():
         if dry_run:
@@ -141,15 +138,16 @@ with open(config_file) as f:
 
 collection = config.get('collection', None)
 collection_prefix = collection.get('prefix', None)
-print('collection_prefix:', collection_prefix)
+#print('collection_prefix:', collection_prefix)
 files = config.get('files', None)
 folder_increment = int(files.get('folder_increment', 1000))
 log_directory_path = Path(files.get('log_directory_path', None))
 number_pad = int(files.get('number_pad', 7))
 output_base_path = Path(files.get('output_base_path', None))
 input_path = Path(files.get('input_path', None))
-print('input_path:', input_path)
+#print('input_path:', input_path)
 # TODO confirm input_path exists and is readable
+# TODO use source_path arg if exists
 
 # Check existence of input path
 if input_path:
@@ -195,7 +193,7 @@ with open(log_file_path, 'w', newline='') as csvfile:
     for file_type, value in file_types.items():
         regex = value.get('regex', None)
         output_sub_path = value.get('output_sub_path', None)
-        print('output_sub_path:', output_sub_path)
+        #print('output_sub_path:', output_sub_path)
         output_path = output_base_path.joinpath(output_sub_path)
         # Check ability to write to directory
         if not os.access(output_path, os.W_OK | os.X_OK):
