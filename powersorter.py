@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import datetime
 import csv
+import pwd
 
 def scan_files(path=None, pattern=None):
     """
@@ -150,6 +151,12 @@ if input_path:
 file_types = config.get('file_types', None)
 # TEST
 log_file_path = 'test.csv'
+
+try:
+    username = pwd.getpwuid(os.getuid()).pw_name
+except:
+    print('ERROR - Unable to retrive username.')
+    username = None
 
 # TODO check ALL output directories before scanning for files
 """
