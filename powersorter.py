@@ -3,6 +3,7 @@ import re
 import os
 from pathlib import Path
 import shutil
+import datetime
 
 
 def scan_files(path=None, pattern=None):
@@ -40,8 +41,11 @@ def scan_files(path=None, pattern=None):
     return matches
 
 def sort_files(files=None, output_path=None):
+    # TEST
+    dry_run = True
     for file in files:
-        file_path = file['file_path']
+        file_path = Path(file['file_path'])
+        basename = file_path.name
         print(f'File {file_path} will be sorted to {output_path}')
         accession_number = int(file['numerical'])
         # Determine what folder number the files should be moved to
@@ -50,7 +54,81 @@ def sort_files(files=None, output_path=None):
         destination_folder_name = collection_prefix + padded_folder_number
         destination_path = Path(output_path).joinpath(destination_folder_name)
         print(destination_path)
+        filetype = 'TEST'
+        move_result = move_file(source=file_path, \
+            destination_directory=destination_path, \
+            filename=basename, \
+            filetype=filetype, \
+            )
+        if move_result['move_success']:
+            #sorted_file_count +=1
+            pass
+        else:
+            #unmoved_file_count +=1
+            pass
 
+
+
+def move_file(source=None, destination_directory=None, filename=None, filetype=None):
+    """
+    Move files from the source to the destination directory.
+    """
+    # Test
+    dry_run = False
+    verbose = True
+    destination = destination_directory.joinpath(filename)
+    if destination.exists():
+        if dry_run:
+            now = datetime.datetime.now()
+            """
+            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
+                'filetype': filetype, 'source': source, 'destination': destination})
+            """
+        if verbose:
+            print('Filename exists, cannot move:', destination)
+        #TODO change to exception
+        move_success = False
+        status = 'fail'
+        details = 'filename exists'
+        now = datetime.datetime.now()
+        """
+        writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
+            'filetype': filetype, 'source': source, 'destination': destination})
+        """
+        return {'move_success': move_success, 'status': status}
+    else:
+        if dry_run:
+            print('DRY-RUN: Moved:', destination)
+            status = 'DRY-RUN - simulated move'
+            move_success = True
+            now = datetime.datetime.now()
+            """
+            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
+                'filetype': filetype, 'source': source, 'destination': destination})
+            """
+        else:
+            # Create directory path if it doesn't exist
+            destination_directory.mkdir(parents=True, exist_ok=True)
+            #TODO Log creation of directory? If so, will need to force exception and only log when no exception
+            try:
+                #shutil.move(source, destination)
+                status = 'success'
+                details = None
+                move_success = True
+            except PermissionError:
+                status = 'fail'
+                details = 'PermissionError'
+                move_success = False
+            now = datetime.datetime.now()
+            """
+            writer.writerow({'timestamp': now, 'username': username, \
+                'action': 'move', 'result': status, 'details': details, \
+                'filetype': filetype, 'source': source, 'destination': destination})
+            """
+            if verbose:
+                print('Move:', destination, status)
+               
+        return {'move_success': move_success, 'status': status}
 
 # load config file
 with open('test.json') as f:
