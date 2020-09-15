@@ -7,6 +7,7 @@ import datetime
 import csv
 import pwd
 import argparse
+import datetime
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -162,8 +163,14 @@ if input_path:
 
 file_types = config.get('file_types', None)
 # TODO dynamicaly generate file name with herb code and timestamp
-log_file_path = log_directory_path.joinpath('log.csv')
+now = datetime.datetime.now()
+log_filename = collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
+if dry_run:
+    log_filename = log_filename + '_DRY-RUN'
+log_filename = log_filename + '.csv'
+log_file_path = log_directory_path.joinpath(log_filename)
 
+# get current username
 try:
     username = pwd.getpwuid(os.getuid()).pw_name
 except:
