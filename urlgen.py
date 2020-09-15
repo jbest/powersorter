@@ -1,6 +1,6 @@
 
 """
-urlgen takes an output log of powersort.py and extracts all the web image paths
+urlgen takes an output log of powersorter.py and extracts all the web image paths
 and converts the paths into a web URL and an export file appropriate for 
 import into Symbiota using the URL Mapping profile.
 
@@ -69,7 +69,7 @@ with open(input_file, newline='') as csvfile:
             # check if JPG
             # TODO check if filetype is web
             #if file_path.upper().endswith('JPG'):
-            print (file_type)
+            #print (file_type)
             if file_type in web_file_types:
                 # get filename parts
                 file_path_obj = Path(file_path)
