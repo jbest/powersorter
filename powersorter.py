@@ -69,6 +69,7 @@ def sort_files(files=None, output_path=None):
 def move_file(source=None, destination_directory=None, filename=None, filetype=None):
     """
     Move files from the source to the destination directory.
+    Creates destination directory if it does not exist.
     Will not overwrite existing files.
     """
     destination = destination_directory.joinpath(filename)
@@ -124,19 +125,20 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--config", required=True, \
     help="Path to the configuration file to be used for processing images.")
-ap.add_argument("-s", "--source", required=False, \
-    help="Source directory - overrides source in config file")
+ap.add_argument("-i", "--input_path", required=False, \
+    help="Input directory path - overrides input_path in config file")
 ap.add_argument("-v", "--verbose", action="store_true", \
     help="Detailed output.")
 ap.add_argument("-n", "--dry_run", action="store_true", \
     help="Simulate the sort process without moving files or creating directories.")
 args = vars(ap.parse_args())
 
-print(args)
+#print(args)
 
-config_file = args["config"]
-dry_run = args["dry_run"]
-verbose = args["verbose"]
+config_file = args['config']
+dry_run = args['dry_run']
+verbose = args['verbose']
+input_path_override = args['input_path']
 
 # load config file
 with open(config_file) as f:
@@ -149,9 +151,11 @@ folder_increment = int(files.get('folder_increment', 1000))
 log_directory_path = Path(files.get('log_directory_path', None))
 number_pad = int(files.get('number_pad', 7))
 output_base_path = Path(files.get('output_base_path', None))
-input_path = Path(files.get('input_path', None))
-# TODO confirm input_path exists and is readable
-# TODO use source_path arg if exists
+
+if input_path_override:
+    input_path = Path(input_path_override)
+else:
+    input_path = Path(files.get('input_path', None))
 
 # Check existence of input path
 if input_path:
@@ -180,12 +184,7 @@ except:
     username = None
 
 # TODO check ALL output directories before scanning for files
-"""
-# Check ability to write to X directory
-if not os.access(output_path, os.W_OK | os.X_OK):
-    print(f'Unable to write to directory: {output_path}')
-    quit()
-"""
+
 with open(log_file_path, 'w', newline='') as csvfile:
     fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -197,7 +196,6 @@ with open(log_file_path, 'w', newline='') as csvfile:
     for file_type, value in file_types.items():
         regex = value.get('regex', None)
         output_sub_path = value.get('output_sub_path', None)
-        #print('output_sub_path:', output_sub_path)
         output_path = output_base_path.joinpath(output_sub_path)
         # Check ability to write to directory
         if not os.access(output_path, os.W_OK | os.X_OK):
@@ -207,7 +205,6 @@ with open(log_file_path, 'w', newline='') as csvfile:
             sort_result = sort_files(files=file_matches, output_path=output_path)
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
-
 
 # Summary report
 print('SORT COMPLETE')
