@@ -15,7 +15,8 @@ def scan_files(path=None, pattern=None, file_type=None):
     Extract relevant parts from file for organization and sorting
     Return a list of matching files
     """
-    # TODO use Path Lib to split path and file name
+    # TODO to improve speed, use pathlib.Path.rglob to first return relevant extensions
+    # TODO then filter with regex
 
     matches = []
     #print('pattern:', pattern)
@@ -33,6 +34,10 @@ def scan_files(path=None, pattern=None, file_type=None):
     return matches
 
 def sort_files(files=None, output_path=None):
+    """
+    Sort and move files into correct directory based on
+    file pattern and directory name increments
+    """
     sorted_file_count = 0
     unmoved_file_count = 0    
     for file in files:
@@ -64,6 +69,7 @@ def sort_files(files=None, output_path=None):
 def move_file(source=None, destination_directory=None, filename=None, filetype=None):
     """
     Move files from the source to the destination directory.
+    Will not overwrite existing files.
     """
     destination = destination_directory.joinpath(filename)
     if destination.exists():
@@ -138,14 +144,12 @@ with open(config_file) as f:
 
 collection = config.get('collection', None)
 collection_prefix = collection.get('prefix', None)
-#print('collection_prefix:', collection_prefix)
 files = config.get('files', None)
 folder_increment = int(files.get('folder_increment', 1000))
 log_directory_path = Path(files.get('log_directory_path', None))
 number_pad = int(files.get('number_pad', 7))
 output_base_path = Path(files.get('output_base_path', None))
 input_path = Path(files.get('input_path', None))
-#print('input_path:', input_path)
 # TODO confirm input_path exists and is readable
 # TODO use source_path arg if exists
 
@@ -160,7 +164,7 @@ if input_path:
         quit()
 
 file_types = config.get('file_types', None)
-# TODO dynamicaly generate file name with herb code and timestamp
+
 now = datetime.datetime.now()
 log_filename = collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
 if dry_run:
