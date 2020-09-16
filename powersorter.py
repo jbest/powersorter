@@ -161,14 +161,16 @@ else:
 if input_path:
     # test to ensure input directory exists
     if input_path.is_dir():
-        print('input_path:', input_path)
+        print('Sorting files from input_path:', input_path)
     else:
         print(f'ERROR: directory {input_path} does not exist.')
         print('Terminating script.')
         quit()
 
+# Get the type of files and patterns that will be scanned and sorted
 file_types = config.get('file_types', None)
 
+# Generate log file name and path
 now = datetime.datetime.now()
 log_filename = collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
 if dry_run:
