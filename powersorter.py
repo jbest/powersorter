@@ -15,7 +15,8 @@ def scan_files(path=None, pattern=None, file_type=None):
     Extract relevant parts from file for organization and sorting
     Return a list of matching files
     """
-    # TODO to improve speed, use pathlib.Path.rglob to first return relevant extensions
+    # TODO use pathlib.Path.rglob to improve speed to
+    # TODO first return relevant extensions
     # TODO then filter with regex
 
     matches = []
