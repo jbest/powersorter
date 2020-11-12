@@ -28,6 +28,7 @@ web_derivs['regex'] = r'(?P<prefix>BRIT)(?P<numerical>\d+)(?P<delimiter>_)(?P<si
 web_derivs['output_sub_path'] = 'test/web/BRIT/'
 """
 # TORCH config version 2.0
+# replaces web_jpg with web_jpg_med and web_jpg_thumb
 web_jpg_med = file_types['web_jpg_med'] = {}
 web_jpg_med['regex'] = r'(?P<catalog_number>(?P<prefix>BRIT)(?P<numerical>\d+))(?P<delimiter>_)(?P<size>med)(\.)(?P<ext>.+)'
 web_jpg_med['output_sub_path'] = 'web/TEST/'
