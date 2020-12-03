@@ -20,7 +20,7 @@ def scan_files(path=None, pattern=None, file_type=None):
     # TODO then filter with regex
 
     matches = []
-    #print('pattern:', pattern)
+    print('pattern:', pattern)
     file_pattern = re.compile(pattern)
     for root, dirs, files in os.walk(path):
         for file in files:
@@ -34,7 +34,7 @@ def scan_files(path=None, pattern=None, file_type=None):
                 matches.append(file_dict)
     return matches
 
-def sort_files(files=None, output_path=None):
+def sort_files(files=None, folder_increment=None, number_pad=None, collection_prefix=None, output_path=None):
     """
     Sort and move files into correct directory based on
     file pattern and directory name increments
@@ -133,27 +133,8 @@ def arg_setup():
     ap.add_argument("-n", "--dry_run", action="store_true", \
         help="Simulate the sort process without moving files or creating directories.")
     args = vars(ap.parse_args())
+    return args
 
-    #print(args)
-    config_file = args['config']
-    dry_run = args['dry_run']
-    verbose = args['verbose']
-    input_path_override = args['input_path']
-
-    if input_path_override:
-        input_path = Path(input_path_override)
-    else:
-        input_path = Path(files.get('input_path', None))
-
-    # Check existence of input path
-    if input_path:
-        # test to ensure input directory exists
-        if input_path.is_dir():
-            print('Sorting files from input_path:', input_path)
-        else:
-            print(f'ERROR: directory {input_path} does not exist.')
-            print('Terminating script.')
-            quit()
 
 def get_config():
     # load config file
@@ -170,53 +151,34 @@ def get_config():
     # Get the type of files and patterns that will be scanned and sorted
     file_types = config.get('file_types', None)
 
-def sort():
-    # Generate log file name and path
-    now = datetime.datetime.now()
-    log_filename = collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
-    if dry_run:
-        log_filename = log_filename + '_DRY-RUN'
-    log_filename = log_filename + '.csv'
-    log_file_path = log_directory_path.joinpath(log_filename)
-
-    # get current username
-    try:
-        username = pwd.getpwuid(os.getuid()).pw_name
-    except:
-        print('ERROR - Unable to retrive username.')
-        username = None
-
+def sort(input_path=None, number_pad=None, folder_increment=None, collection_prefix=None, file_types=None, destination_base_path=None):
     # TODO check ALL output directories before scanning for files
-    with open(log_file_path, 'w', newline='') as csvfile:
-        fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-
-        # scan, sort, and move each file type
-        sorted_file_count = 0
-        unmoved_file_count = 0 # files matching pattern, but not moved/sorted
-        for file_type, value in file_types.items():
-            regex = value.get('regex', None)
-            output_sub_path = value.get('output_sub_path', None)
-            output_path = output_base_path.joinpath(output_sub_path)
-            # Check ability to write to directory
-            if not os.access(output_path, os.W_OK | os.X_OK):
-                print(f'Unable to write to directory: {output_path}')
-            else:
-                file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
-                sort_result = sort_files(files=file_matches, output_path=output_path)
-                sorted_file_count += sort_result.get('sorted_file_count', 0)
-                unmoved_file_count += sort_result.get('unmoved_file_count', 0)
-
-    # Summary report
-    print('SORT COMPLETE')
-    print('Log file written to:', log_file_path)
-    print('sorted_file_count', sorted_file_count)
-    print('unmoved_file_count', unmoved_file_count)
+    # scan, sort, and move each file type
+    sorted_file_count = 0
+    unmoved_file_count = 0 # files matching pattern, but not moved/sorted
+    for file_type, value in file_types.items():
+        print('file_type', file_type, 'value', value)
+        regex = value.get('regex', None)
+        output_sub_path = value.get('output_sub_path', None)
+        output_path = destination_base_path.joinpath(output_sub_path)
+        # Check ability to write to directory
+        if not os.access(output_path, os.W_OK | os.X_OK):
+            print(f'Unable to write to directory: {output_path}')
+        else:
+            file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
+            sort_result = sort_files(files=file_matches, \
+                number_pad=number_pad, \
+                folder_increment=folder_increment, \
+                collection_prefix=collection_prefix, \
+                output_path=output_path)
+            sorted_file_count += sort_result.get('sorted_file_count', 0)
+            unmoved_file_count += sort_result.get('unmoved_file_count', 0)
 
 class Settings():
-    def __init__(self, prefix=None):
+    def __init__(self, prefix=None, dry_run=None, verbose=None):
         self.prefix = prefix
+        self.dry_run = dry_run
+        self.verbose = verbose
 
     def load_config(self, config_file=None):
         # load config file
@@ -236,14 +198,69 @@ class Settings():
     
 if __name__ == '__main__':
     # initialize settings
-    settings = Settings()
-    settings.load_config(config_file='/Users/jbest/Documents/brit-svn/git/powersorter/TEST-v2.json')
-    #Load settings from config
-
     # set up argparse
-    #arg_setup()
-    # get configuration
-    #get_config()
-    # start sorting
-    #sort()
+    args = arg_setup()
+        #print(args)
+    config_file = args['config']
+    dry_run = args['dry_run']
+    verbose = args['verbose']
+    input_path_override = args['input_path']
 
+
+    """
+    #TODO reactivate input path override
+    if input_path_override:
+        input_path = Path(input_path_override)
+    else:
+        input_path = Path(files.get('input_path', None))
+
+    # Check existence of input path
+    if input_path:
+        # test to ensure input directory exists
+        if input_path.is_dir():
+            print('Sorting files from input_path:', input_path)
+        else:
+            print(f'ERROR: directory {input_path} does not exist.')
+            print('Terminating script.')
+            quit()
+    """
+
+    settings = Settings(dry_run=dry_run, verbose=verbose)
+    #settings.load_config(config_file='/Users/jbest/Documents/brit-svn/git/powersorter/TEST-v2.json')
+    #Load settings from config
+    settings.load_config(config_file=config_file)
+
+    # Generate log file name and path
+    now = datetime.datetime.now()
+    log_filename = settings.collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
+    if dry_run:
+        log_filename = log_filename + '_DRY-RUN'
+    log_filename = log_filename + '.csv'
+    log_file_path = settings.log_directory_path.joinpath(log_filename)
+
+    # get current username
+    try:
+        username = pwd.getpwuid(os.getuid()).pw_name
+    except:
+        print('ERROR - Unable to retrive username.')
+        username = None
+    
+    csvfile = open(log_file_path, 'w', newline='')
+    fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+
+    input_path = Path(settings.files.get('input_path', None))
+    # start sorting
+    sort(input_path=input_path, \
+        number_pad=settings.number_pad, \
+        folder_increment=settings.folder_increment, \
+        collection_prefix=settings.collection_prefix, \
+        file_types=settings.file_types, \
+        destination_base_path=settings.output_base_path)
+    csvfile.close()
+    # Summary report
+    print('SORT COMPLETE')
+    print('Log file written to:', log_file_path)
+    #print('sorted_file_count', sorted_file_count)
+    #print('unmoved_file_count', unmoved_file_count)
