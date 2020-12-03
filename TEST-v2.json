@@ -30,10 +30,12 @@
         },
         "archive_dng": {
             "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>DNG)",
+            "file_regex": "(_(?P<suffix>.+))*(\\.)(?i)(?P<ext>dng)",
             "output_sub_path": "archive/"
         },
         "ocr": {
             "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(?P<delimiter>_)(?P<ocr>ocr)(\\.)(?P<ext>.+)",
+            "file_regex": "(_(?P<suffix>.+))*(_ocr)(\\.)(?i)(?P<ext>txt|json)",
             "output_sub_path": "web/"
         }
     }
