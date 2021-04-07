@@ -24,7 +24,7 @@
         },
         "web_derivs": {
             "regex_old": "(?P<prefix>BRIT)(?P<numerical>\\d+)(?P<delimiter>_)(?P<size>med|thumb)(\\.)(?P<ext>.+)",
-            "file_regex": "(_(?P<suffix>.+))*(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>.+))*(_)(?P<size>med|thumb)(\\.)(?i)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/"
         },
         "archive_dng": {
