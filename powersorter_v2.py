@@ -15,12 +15,8 @@ def scan_files(path=None, pattern=None, file_type=None):
     Extract relevant parts from file for organization and sorting
     Return a list of matching files
     """
-    # TODO use pathlib.Path.rglob to improve speed to
-    # TODO first return relevant extensions
-    # TODO then filter with regex
-
     matches = []
-    print('pattern:', pattern)
+    #print('pattern:', pattern)
     file_pattern = re.compile(pattern)
     for root, dirs, files in os.walk(path):
         for file in files:
@@ -46,9 +42,9 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         file_type = file['file_type']
         basename = file_path.name
         #print(f'File {file_path} will be sorted to {output_path}')
-        accession_number = int(file['numerical'])
+        numerical = int(file['numerical'])
         # Determine what folder number the files should be moved to
-        folder_number = int(accession_number//folder_increment*folder_increment)
+        folder_number = int(numerical//folder_increment*folder_increment)
         padded_folder_number = str(folder_number).zfill(number_pad)
         destination_folder_name = collection_prefix + padded_folder_number
         destination_path = Path(output_path).joinpath(destination_folder_name)
@@ -151,18 +147,22 @@ def get_config():
     # Get the type of files and patterns that will be scanned and sorted
     file_types = config.get('file_types', None)
 
-def sort(input_path=None, number_pad=None, folder_increment=None, collection_prefix=None, file_types=None, destination_base_path=None):
+def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
+    collection_prefix=None, file_types=None, destination_base_path=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
     sorted_file_count = 0
     unmoved_file_count = 0 # files matching pattern, but not moved/sorted
     for file_type, value in file_types.items():
-        print('file_type', file_type, 'value', value)
-        regex = value.get('regex', None)
+        #print('file_type', file_type, 'value', value)
+        #regex = value.get('regex', None)
+        file_regex = value.get('file_regex', None)
+        regex = catalog_number_regex + file_regex
         output_sub_path = value.get('output_sub_path', None)
         output_path = destination_base_path.joinpath(output_sub_path)
         # Check ability to write to directory
         if not os.access(output_path, os.W_OK | os.X_OK):
+            #TODO log fail
             print(f'Unable to write to directory: {output_path}')
         else:
             file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
@@ -188,6 +188,7 @@ class Settings():
                 #print(config)
                 self.collection = config.get('collection', None)
                 self.collection_prefix = self.collection.get('prefix', None)
+                self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.files = config.get('files', None)
                 self.folder_increment = int(self.files.get('folder_increment', 1000))
                 self.log_directory_path = Path(self.files.get('log_directory_path', None))
@@ -205,7 +206,6 @@ if __name__ == '__main__':
     dry_run = args['dry_run']
     verbose = args['verbose']
     input_path_override = args['input_path']
-
 
     """
     #TODO reactivate input path override
@@ -251,10 +251,12 @@ if __name__ == '__main__':
     writer.writeheader()
 
     input_path = Path(settings.files.get('input_path', None))
+    #print(settings.catalog_number_regex)
     # start sorting
     sort(input_path=input_path, \
         number_pad=settings.number_pad, \
         folder_increment=settings.folder_increment, \
+        catalog_number_regex=settings.catalog_number_regex,\
         collection_prefix=settings.collection_prefix, \
         file_types=settings.file_types, \
         destination_base_path=settings.output_base_path)
