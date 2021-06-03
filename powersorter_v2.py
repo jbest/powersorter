@@ -8,6 +8,7 @@ import csv
 import pwd
 import argparse
 import datetime
+import sys
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -63,11 +64,11 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         }
 
 
-def move_file(source=None, destination_directory=None, filename=None, filetype=None):
+def move_file(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite_confirmed=False):
     """
     Move files from the source to the destination directory.
     Creates destination directory if it does not exist.
-    Will not overwrite existing files.
+    Will overwrite existing files if force_overwrite_confirmed = True.
     """
     destination = destination_directory.joinpath(filename)
     if destination.exists():
@@ -128,6 +129,8 @@ def arg_setup():
         help="Detailed output.")
     ap.add_argument("-n", "--dry_run", action="store_true", \
         help="Simulate the sort process without moving files or creating directories.")
+    ap.add_argument("-f", "--force", action="store_true", \
+        help="Force overwrite of existing files.")
     args = vars(ap.parse_args())
     return args
 
@@ -175,10 +178,11 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
 
 class Settings():
-    def __init__(self, prefix=None, dry_run=None, verbose=None):
+    def __init__(self, prefix=None, dry_run=None, verbose=None, force_overwrite=None):
         self.prefix = prefix
         self.dry_run = dry_run
         self.verbose = verbose
+        self.force_overwrite = force_overwrite
 
     def load_config(self, config_file=None):
         # load config file
@@ -205,6 +209,7 @@ if __name__ == '__main__':
     config_file = args['config']
     dry_run = args['dry_run']
     verbose = args['verbose']
+    force_overwrite = args['force']
     input_path_override = args['input_path']
 
     """
@@ -224,8 +229,20 @@ if __name__ == '__main__':
             print('Terminating script.')
             quit()
     """
+    #Confirm force overwrite
+    force_overwrite_confirmed = False
+    if force_overwrite:
+        print('Files with identical names will be overwritten if you proceed.')
+        response = input('Type \'JCR\' and [RETURN/ENTER] to confirm desire to overwrite files: ')
+        if response == 'JCR':
+            print('Will overwrite (Test)')
+            force_overwrite_confirmed = True
+        else:
+            print('Overwrite not confirmed. Exiting...')
+            force_overwrite_confirmed = False
+            sys.exit()
 
-    settings = Settings(dry_run=dry_run, verbose=verbose)
+    settings = Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite)
     #settings.load_config(config_file='/Users/jbest/Documents/brit-svn/git/powersorter/TEST-v2.json')
     #Load settings from config
     settings.load_config(config_file=config_file)
