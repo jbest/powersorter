@@ -64,11 +64,10 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         }
 
 
-def move_file(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite_confirmed=False):
+def move_file(source=None, destination_directory=None, filename=None, filetype=None):
     """
     Move files from the source to the destination directory.
     Creates destination directory if it does not exist.
-    Will overwrite existing files if force_overwrite_confirmed = True.
     """
     destination = destination_directory.joinpath(filename)
     if destination.exists():
@@ -116,6 +115,62 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                
         return {'move_success': move_success, 'status': status}
 
+def move_file_overwrite(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False):
+    """
+    Move files from the source to the destination directory.
+    Creates destination directory if it does not exist.
+    Will overwrite existing files if force_overwrite_confirmed = True.
+    """
+    destination = destination_directory.joinpath(filename)
+    if dry_run:
+        if destination.exists():
+            now = datetime.datetime.now()
+            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
+                'filetype': filetype, 'source': source, 'destination': destination})
+        else:
+            print('DRY-RUN: Moved:', destination)
+            status = 'DRY-RUN - simulated move'
+            move_success = True
+            now = datetime.datetime.now()
+            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
+                'filetype': filetype, 'source': source, 'destination': destination})
+    else:
+        # Create directory path if it doesn't exist
+        destination_directory.mkdir(parents=True, exist_ok=True)
+        #TODO Log creation of directory? If so, will need to force exception and only log when no exception
+        if destination.exists() and force_overwrite == False:
+            if verbose:
+                print('Filename exists, cannot move:', destination)
+            #TODO change to exception
+            move_success = False
+            status = 'fail'
+            details = 'filename exists'
+            now = datetime.datetime.now()
+            writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
+                'filetype': filetype, 'source': source, 'destination': destination})
+        else:
+            try:
+                if destination.exists():
+                    details = 'duplicate file name - overwritten'
+                    if verbose:
+                        print('Overwritting:', destination)  
+                else:
+                    details = None
+                shutil.move(source, destination)
+                status = 'success'
+                move_success = True
+            except PermissionError:
+                status = 'fail'
+                details = 'PermissionError'
+                move_success = False
+            now = datetime.datetime.now()
+            writer.writerow({'timestamp': now, 'username': username, \
+                'action': 'move', 'result': status, 'details': details, \
+                'filetype': filetype, 'source': source, 'destination': destination})
+            if verbose:
+                print('Move:', destination, status)    
+    return {'move_success': move_success, 'status': status}
+
 # TODO Make dry run more useful - make it test destination perms and perms for each file to be moved
 
 def arg_setup():
@@ -134,7 +189,7 @@ def arg_setup():
     args = vars(ap.parse_args())
     return args
 
-
+"""
 def get_config():
     # load config file
     with open(config_file) as f:
@@ -149,6 +204,7 @@ def get_config():
 
     # Get the type of files and patterns that will be scanned and sorted
     file_types = config.get('file_types', None)
+"""
 
 def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
     collection_prefix=None, file_types=None, destination_base_path=None):
@@ -233,16 +289,16 @@ if __name__ == '__main__':
     force_overwrite_confirmed = False
     if force_overwrite:
         print('Files with identical names will be overwritten if you proceed.')
-        response = input('Type \'JCR\' and [RETURN/ENTER] to confirm desire to overwrite files: ')
-        if response == 'JCR':
-            print('Will overwrite (Test)')
+        response = input('Type \'overwrite\' and [RETURN/ENTER] to confirm desire to overwrite files: ')
+        if response == 'overwrite':
+            print('Will overwrite duplicate file names...')
             force_overwrite_confirmed = True
         else:
             print('Overwrite not confirmed. Exiting...')
             force_overwrite_confirmed = False
             sys.exit()
 
-    settings = Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite)
+    settings = Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
     #settings.load_config(config_file='/Users/jbest/Documents/brit-svn/git/powersorter/TEST-v2.json')
     #Load settings from config
     settings.load_config(config_file=config_file)
