@@ -65,57 +65,6 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         'unmoved_file_count': unmoved_file_count, \
         }
 
-
-def move_file(source=None, destination_directory=None, filename=None, filetype=None):
-    """
-    Move files from the source to the destination directory.
-    Creates destination directory if it does not exist.
-    """
-    destination = destination_directory.joinpath(filename)
-    if destination.exists():
-        if dry_run:
-            now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
-                'filetype': filetype, 'source': source, 'destination': destination})
-        if verbose:
-            print('Filename exists, cannot move:', destination)
-        #TODO change to exception
-        move_success = False
-        status = 'fail'
-        details = 'filename exists'
-        now = datetime.datetime.now()
-        writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
-            'filetype': filetype, 'source': source, 'destination': destination})
-        return {'move_success': move_success, 'status': status}
-    else:
-        if dry_run:
-            print('DRY-RUN: Moved:', destination)
-            status = 'DRY-RUN - simulated move'
-            move_success = True
-            now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
-                'filetype': filetype, 'source': source, 'destination': destination})
-        else:
-            # Create directory path if it doesn't exist
-            destination_directory.mkdir(parents=True, exist_ok=True)
-            #TODO Log creation of directory? If so, will need to force exception and only log when no exception
-            try:
-                shutil.move(source, destination)
-                status = 'success'
-                details = None
-                move_success = True
-            except PermissionError:
-                status = 'fail'
-                details = 'PermissionError'
-                move_success = False
-            now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, \
-                'action': 'move', 'result': status, 'details': details, \
-                'filetype': filetype, 'source': source, 'destination': destination})
-            if verbose:
-                print('Move:', destination, status)
-        return {'move_success': move_success, 'status': status}
-
 def move_file_overwrite(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False):
     """
     Move files from the source to the destination directory.
