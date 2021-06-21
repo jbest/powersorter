@@ -49,10 +49,12 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         padded_folder_number = str(folder_number).zfill(number_pad)
         destination_folder_name = collection_prefix + padded_folder_number
         destination_path = Path(output_path).joinpath(destination_folder_name)
-        move_result = move_file(source=file_path, \
+        #move_result = move_file(source=file_path, \
+        move_result = move_file_overwrite(source=file_path, \
             destination_directory=destination_path, \
             filename=basename, \
             filetype=file_type, \
+            force_overwrite=settings.force_overwrite
             )
         if move_result['move_success']:
             sorted_file_count +=1
@@ -112,7 +114,6 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                 'filetype': filetype, 'source': source, 'destination': destination})
             if verbose:
                 print('Move:', destination, status)
-               
         return {'move_success': move_success, 'status': status}
 
 def move_file_overwrite(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False):
@@ -188,23 +189,6 @@ def arg_setup():
         help="Force overwrite of existing files.")
     args = vars(ap.parse_args())
     return args
-
-"""
-def get_config():
-    # load config file
-    with open(config_file) as f:
-        config = json.load(f)
-    collection = config.get('collection', None)
-    collection_prefix = collection.get('prefix', None)
-    files = config.get('files', None)
-    folder_increment = int(files.get('folder_increment', 1000))
-    log_directory_path = Path(files.get('log_directory_path', None))
-    number_pad = int(files.get('number_pad', 7))
-    output_base_path = Path(files.get('output_base_path', None))
-
-    # Get the type of files and patterns that will be scanned and sorted
-    file_types = config.get('file_types', None)
-"""
 
 def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
     collection_prefix=None, file_types=None, destination_base_path=None):
@@ -299,7 +283,6 @@ if __name__ == '__main__':
             sys.exit()
 
     settings = Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
-    #settings.load_config(config_file='/Users/jbest/Documents/brit-svn/git/powersorter/TEST-v2.json')
     #Load settings from config
     settings.load_config(config_file=config_file)
 
