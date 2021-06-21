@@ -10,6 +10,9 @@ import argparse
 import datetime
 import sys
 
+
+CONFIG_FORMAT_REQUIRED = '3.0'
+
 def scan_files(path=None, pattern=None, file_type=None):
     """
     Scan the directory for files matching the provided pattern.
@@ -179,6 +182,8 @@ class Settings():
             with open(config_file) as f:
                 config = json.load(f)
                 #print(config)
+                self.versions = config.get('versions', None)
+                self.config_format = self.versions.get('config_format')
                 self.collection = config.get('collection', None)
                 self.collection_prefix = self.collection.get('prefix', None)
                 self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
@@ -234,6 +239,11 @@ if __name__ == '__main__':
     settings = Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
     #Load settings from config
     settings.load_config(config_file=config_file)
+
+    # Check required config_file version
+    if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
+        print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
+        sys.exit()
 
     # Generate log file name and path
     now = datetime.datetime.now()
