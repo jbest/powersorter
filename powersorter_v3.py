@@ -11,7 +11,7 @@ import datetime
 import sys
 
 
-CONFIG_FORMAT_REQUIRED = '3.0'
+CONFIG_FORMAT_REQUIRED = '3.1'
 
 def scan_files(path=None, pattern=None, file_type=None):
     """

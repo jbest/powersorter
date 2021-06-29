@@ -1,4 +1,10 @@
 import json
+"""
+Generates an example JSON format for the configuration file
+used by various scripts for sorting, URL generation, etc
+in TORCH and BRIT image workflows.
+Prints JSON text to screen. Pipe text to file to create cofig file.
+"""
 
 # boilerplate
 config = {}
