@@ -15,6 +15,7 @@ import re
 import os.path
 from urllib.parse import urljoin
 from pathlib import Path
+import json
 
 #FILE_BASE_PATH = '/corral-repl/projects/TORCH/web/'
 #URL_BASE = 'https://web.corral.tacc.utexas.edu/torch/'
@@ -37,6 +38,7 @@ args = vars(ap.parse_args())
 
 input_file = args['input']
 config_file = args['config']
+verbose = args['verbose']
 #file_prefix = args["prefix"]
 # v3, v2, and v1 file types
 web_file_types = ['web', 'web_derivs', 'web_jpg_med', 'web_jpg_thumb', 'web_jpg'] # file types that will have url generated
@@ -67,6 +69,7 @@ class Settings():
                 self.config_format = self.versions.get('config_format')
                 self.collection = config.get('collection', None)
                 self.collection_prefix = self.collection.get('prefix', None)
+                self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.web_base = self.collection.get('web_base', None) # path of directory available via HTTP/S
                 self.url_base = self.collection.get('url_base', None) # URL of directory served via HTTP/S
                 #self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
@@ -77,7 +80,22 @@ class Settings():
                 #self.output_base_path = Path(self.files.get('output_base_path', None))
                 # Get the type of files and patterns that will be scanned and sorted
                 #self.file_types = config.get('file_types', None)
-    
+
+settings = Settings(verbose=verbose)
+#Load settings from config
+settings.load_config(config_file=config_file)
+file_prefix = settings.collection_prefix
+FILE_BASE_PATH = settings.web_base
+URL_BASE = settings.url_base
+#TODO change pattern string to match regex in config file
+#pattern_string = '(' + file_prefix + '\d+)'
+pattern_string = settings.catalog_number_regex
+catalog_number_pattern = re.compile(pattern_string)
+if settings.verbose:
+    print('FILE_BASE_PATH', FILE_BASE_PATH)
+    print('URL_BASE', URL_BASE)
+    print('pattern_string', pattern_string)
+    print('catalog_number_pattern', catalog_number_pattern)
 
 def generate_url(file_base_path=FILE_BASE_PATH, file_path=None, url_base=URL_BASE):
     """
@@ -87,18 +105,6 @@ def generate_url(file_base_path=FILE_BASE_PATH, file_path=None, url_base=URL_BAS
     relative_path = os.path.relpath(file_path, start=common_path)
     image_url = urljoin(URL_BASE, relative_path)
     return image_url
-
-settings = Settings()
-#Load settings from config
-settings.load_config(config_file=config_file)
-file_prefix = settings.collection_prefix
-FILE_BASE_PATH = settings.web_base
-URL_BASE = settings.url_base
-
-#TODO change pattern string to match regex in config file
-#pattern_string = '(' + file_prefix + '\d+)'
-pattern_string = settings.catalog_number_regex
-catalog_number_pattern = re.compile(pattern_string)
 
 occurrence_set = {}
 with open(input_file, newline='') as csvfile:
