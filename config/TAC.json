@@ -1,0 +1,31 @@
+{
+    "collection": {
+        "name": "TAC",
+        "prefix": "TAC"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/TAC/logs/",
+        "output_base_path": "/corral-repl/projects/TORCH/",
+        "input_path": "/corral-repl/projects/TORCH/tools/ingest/TAC"
+    },
+    "file_types": {
+        "web_jpg": {
+            "regex": "(?P<prefix>TAC)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/TAC/"
+        },
+        "web_derivs": {
+            "regex": "(?P<prefix>TAC)(?P<numerical>\\d+)(?P<delimiter>_)(?P<size>med|thumb)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/TAC/"
+        },
+        "archive_dng": {
+            "regex": "(?P<prefix>TAC)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>DNG)",
+            "output_sub_path": "archive/TAC/"
+        },
+        "ocr": {
+            "regex": "(?P<prefix>TAC)(?P<numerical>\\d+)(?P<delimiter>_)(?P<ocr>ocr)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/TAC/"
+        }
+    }
+}

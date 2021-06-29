@@ -1,0 +1,37 @@
+{
+    "collection": {
+        "name": "BRIT",
+        "prefix": "BRIT"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/media/jbest/data/git/powersorter/",
+        "output_base_path": "//media/jbest/data/git/powersorter/",
+        "web_base_path": "/media/jbest/data/git/powersorter/",
+        "archive_base_path": "/media/jbest/data/git/powersorter/",
+        "input_path": "/media/jbest/data/git/powersorter/input_dir/"
+    },
+    "file_types": {
+        "web_jpg": {
+            "regex": "(?P<catalog_number>(?P<prefix>BRIT)(?P<numerical>\\d+))(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/BRIT/"
+        },
+        "web_jpg_med": {
+            "regex": "(?P<catalog_number>(?P<prefix>BRIT)(?P<numerical>\\d+))(?P<delimiter>_)(?P<size>med)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/BRIT/"
+        },
+        "web_jpg_thumb": {
+            "regex": "(?P<catalog_number>(?P<prefix>BRIT)(?P<numerical>\\d+))(?P<delimiter>_)(?P<size>thumb)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/BRIT/"
+        },
+        "archive_dng": {
+            "regex": "(?P<catalog_number>(?P<prefix>BRIT)(?P<numerical>\\d+))(\\.)(?i)(?P<ext>DNG)",
+            "output_sub_path": "archive/BRIT/"
+        },
+        "ocr": {
+            "regex": "(?P<catalog_number>(?P<prefix>BRIT)(?P<numerical>\\d+))(?P<delimiter>_)(?P<ocr>ocr)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/BRIT/"
+        }
+    }
+}
