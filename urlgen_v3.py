@@ -35,10 +35,10 @@ ap.add_argument("-v", "--verbose", action="store_true", \
     help="Detailed output.")
 args = vars(ap.parse_args())
 
-input_file = args["input"]
+input_file = args['input']
+config_file = args['config']
 #file_prefix = args["prefix"]
-file_prefix = 
-# v2 and v1 file types
+# v3, v2, and v1 file types
 web_file_types = ['web', 'web_derivs', 'web_jpg_med', 'web_jpg_thumb', 'web_jpg'] # file types that will have url generated
 if args["thumb_tag"]:
     thumb_ext = args["thumb_tag"]
@@ -51,11 +51,11 @@ else:
     medium_ext = DEFAULT_MEDIUM_EXT
 
 class Settings():
-    def __init__(self, prefix=None, verbose=None):
-        self.prefix = prefix
-        self.dry_run = dry_run
+    def __init__(self, verbose=False):
+        #self.prefix = prefix
+        #self.dry_run = dry_run
         self.verbose = verbose
-        self.force_overwrite = force_overwrite
+        #self.force_overwrite = force_overwrite
 
     def load_config(self, config_file=None):
         # load config file
@@ -88,7 +88,16 @@ def generate_url(file_base_path=FILE_BASE_PATH, file_path=None, url_base=URL_BAS
     image_url = urljoin(URL_BASE, relative_path)
     return image_url
 
-pattern_string = '(' + file_prefix + '\d+)'
+settings = Settings()
+#Load settings from config
+settings.load_config(config_file=config_file)
+file_prefix = settings.collection_prefix
+FILE_BASE_PATH = settings.web_base
+URL_BASE = settings.url_base
+
+#TODO change pattern string to match regex in config file
+#pattern_string = '(' + file_prefix + '\d+)'
+pattern_string = settings.catalog_number_regex
 catalog_number_pattern = re.compile(pattern_string)
 
 occurrence_set = {}
@@ -125,10 +134,6 @@ with open(input_file, newline='') as csvfile:
 input_file_name_stem = Path(input_file).stem
 output_file_name = input_file_name_stem + '_urls.csv'
 print('Writing urls to:', output_file_name)
-
-settings = Settings()
-#Load settings from config
-settings.load_config(config_file=config_file)
 
 with open(output_file_name, 'w', newline='') as csvfile:
     fieldnames=['catalog_number', 'large', 'web', 'thumbnail']
