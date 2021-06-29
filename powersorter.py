@@ -11,7 +11,7 @@ import datetime
 import sys
 
 
-CONFIG_FORMAT_REQUIRED = '3.1'
+CONFIG_FORMAT_REQUIRED = '3.0'
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -278,6 +278,8 @@ if __name__ == '__main__':
     csvfile.close()
     # Summary report
     print('SORT COMPLETE')
+    if verbose:
+        print('sorted_file_count', sorted_file_count)
+        print('unmoved_file_count', unmoved_file_count)
     print('Log file written to:', log_file_path)
-    #print('sorted_file_count', sorted_file_count)
-    #print('unmoved_file_count', unmoved_file_count)
+
