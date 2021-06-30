@@ -12,6 +12,8 @@ import sys
 
 
 CONFIG_FORMAT_REQUIRED = '3.0'
+#sorted_file_count = 0
+#unmoved_file_count = 0
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -78,6 +80,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
     if dry_run:
         if destination.exists():
             now = datetime.datetime.now()
+            move_success = False
             writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
                 'filetype': filetype, 'source': source, 'destination': destination})
         else:
