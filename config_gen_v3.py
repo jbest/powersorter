@@ -15,7 +15,7 @@ collection = config['collection'] = {}
 collection['name'] = 'TEST'
 collection['prefix'] = 'TEST'
 collection['catalog_number_regex'] = r'(?P<catNum>(?P<instID>BRIT)(-(?P<collID>L)-)*(?P<numerical>\d+))'
-collection['web_base'] = '/corral-repl/projects/TORCH/web/'
+collection['web_base'] = '/corral-repl/projects/TORCH/web/TEST/'
 collection['url_base'] = 'https://web.corral.tacc.utexas.edu/torch/'
 files = config['files'] = {}
 files['folder_increment'] = 1000
