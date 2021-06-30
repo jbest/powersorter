@@ -10,10 +10,11 @@ import argparse
 import datetime
 import sys
 
+print('STARTING')
 
 CONFIG_FORMAT_REQUIRED = '3.0'
-#sorted_file_count = 0
-#unmoved_file_count = 0
+sorted_file_count = 0
+unmoved_file_count = 0
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -149,8 +150,8 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
     collection_prefix=None, file_types=None, destination_base_path=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
-    sorted_file_count = 0
-    unmoved_file_count = 0 # files matching pattern, but not moved/sorted
+    global sorted_file_count
+    global unmoved_file_count # files matching pattern, but not moved/sorted
     for file_type, value in file_types.items():
         #print('file_type', file_type, 'value', value)
         #regex = value.get('regex', None)
