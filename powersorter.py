@@ -82,6 +82,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
         if destination.exists():
             now = datetime.datetime.now()
             move_success = False
+            status = 'DRY-RUN - simulated move'
             writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
                 'filetype': filetype, 'source': source, 'destination': destination})
         else:
@@ -286,4 +287,3 @@ if __name__ == '__main__':
         print('sorted_file_count', sorted_file_count)
         print('unmoved_file_count', unmoved_file_count)
     print('Log file written to:', log_file_path)
-
