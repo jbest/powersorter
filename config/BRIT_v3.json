@@ -6,7 +6,7 @@
         "name": "BRIT",
         "prefix": "BRIT",
         "catalog_number_regex": "(?P<catNum>(?P<instID>BRIT)(-(?P<collID>XX)-)*(?P<numerical>\\d+))",
-        "web_base": "/corral-repl/projects/TORCH/web/BRIT/",
+        "web_base": "/corral-repl/projects/TORCH/web/BRIT",
         "url_base": "https://web.corral.tacc.utexas.edu/torch/"
     },
     "files": {

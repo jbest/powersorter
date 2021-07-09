@@ -90,9 +90,21 @@ def generate_url(file_base_path=None, file_path=None, url_base=None):
     """
     Generate a URL using the file paths and URL base path.
     """
+    #print(file_base_path, file_path, url_base)
     common_path = os.path.commonpath([file_base_path, file_path])
-    relative_path = os.path.relpath(file_path, start=common_path)
+    #web_base_path = os.path.realpath(file_base_path)
+    web_base_parent_path, common_dirname = os.path.split(common_path)
+    #relative_path = os.path.relpath(file_path, start=common_path)
+    relative_path = os.path.relpath(file_path, start=web_base_parent_path)
     image_url = urljoin(url_base, relative_path)
+    """
+    print('file_path', file_path)
+    print('common_path', common_path)
+    print('common_dirname', common_dirname)
+    print('web_base_path', web_base_path)
+    print('relative_path', relative_path)
+    print('image_url',image_url)
+    """
     return image_url
 
 def generate_url_records(file_base_path=None, url_base=None):
@@ -211,7 +223,7 @@ if __name__ == '__main__':
     #Load settings from config
     settings.load_config(config_file=config_file)
     file_prefix = settings.collection_prefix
-    file_base_path = settings.web_base
+    #file_base_path = settings.web_base
     url_base = settings.url_base
     web_base = settings.web_base
 
@@ -219,7 +231,7 @@ if __name__ == '__main__':
     catalog_number_pattern = re.compile(pattern_string)
     if settings.verbose:
         print('settings:')
-        print('file_base_path', file_base_path)
+        #print('file_base_path', file_base_path)
         print('url_base', url_base)
         print('pattern_string', pattern_string)
         print('catalog_number_pattern', catalog_number_pattern)
