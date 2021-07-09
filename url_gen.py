@@ -107,6 +107,12 @@ def generate_url(file_base_path=FILE_BASE_PATH, file_path=None, url_base=URL_BAS
     return image_url
 
 def generate_url_records():
+    """
+    This method does not account for suffixes. They will overwrite or be 
+    overwritten when a file without a suffix is in the record.
+    This method does not use regex to determine the filetype, instead
+    relies on the powersort input field 'filetype'.
+    """
     global occurrence_set
     with open(input_file, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
