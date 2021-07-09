@@ -41,6 +41,7 @@ config_file = args['config']
 verbose = args['verbose']
 #file_prefix = args["prefix"]
 # v3, v2, and v1 file types
+# once regex is exclusivly used, these file type will not be needed
 web_file_types = ['web', 'web_derivs', 'web_jpg_med', 'web_jpg_thumb', 'web_jpg'] # file types that will have url generated
 if args["thumb_tag"]:
     thumb_ext = args["thumb_tag"]
@@ -85,39 +86,23 @@ class Settings():
                 # Get the type of files and patterns that will be scanned and sorted
                 #self.file_types = config.get('file_types', None)
 
-settings = Settings(verbose=verbose)
-#Load settings from config
-settings.load_config(config_file=config_file)
-file_prefix = settings.collection_prefix
-FILE_BASE_PATH = settings.web_base
-URL_BASE = settings.url_base
-#TODO change pattern string to match regex in config file
-#pattern_string = '(' + file_prefix + '\d+)'
-pattern_string = settings.catalog_number_regex
-catalog_number_pattern = re.compile(pattern_string)
-if settings.verbose:
-    print('FILE_BASE_PATH', FILE_BASE_PATH)
-    print('URL_BASE', URL_BASE)
-    print('pattern_string', pattern_string)
-    print('catalog_number_pattern', catalog_number_pattern)
-
-def generate_url(file_base_path=FILE_BASE_PATH, file_path=None, url_base=URL_BASE):
+def generate_url(file_base_path=None, file_path=None, url_base=None):
     """
     Generate a URL using the file paths and URL base path.
     """
     common_path = os.path.commonpath([file_base_path, file_path])
     relative_path = os.path.relpath(file_path, start=common_path)
-    image_url = urljoin(URL_BASE, relative_path)
+    image_url = urljoin(url_base, relative_path)
     return image_url
 
-def generate_url_records():
+def generate_url_records(file_base_path=None, url_base=None):
     """
     This method does not account for suffixes. They will overwrite or be 
     overwritten when a file without a suffix is in the record.
     This method does not use regex to determine the filetype, instead
     relies on the powersort input field 'filetype'.
     """
-    global occurrence_set
+    occurrence_set = {}
     with open(input_file, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -139,22 +124,66 @@ def generate_url_records():
                             occurrence_set[catalog_number]={'catalog_number': catalog_number}
                         # Determine if thumbnail, original, or web size
                         if file_name.endswith(thumb_ext):
-                            occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path)
+                            occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path, file_base_path=file_base_path, url_base=url_base)
                         elif file_name.endswith(medium_ext):
-                            occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path)
+                            occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path, file_base_path=file_base_path, url_base=url_base)
                         else:
-                            occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path)
+                            occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path, file_base_path=file_base_path, url_base=url_base)
                     except AttributeError:
                         print(f'No match for file_name {file_name} with prefix {file_prefix}')
+    return occurrence_set
 
-def generate_url_records_suffixes():
+def match_pattern(text=None, settings=None):
+    #matches = {'catalog_number':None, 'institution_id': None, 'collection_id': None, 'numerical': None, 'suffix': None, 'size': None, 'extension': None}
+    #print('EVALUATING:', text)
+    web_jpg_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_regex)
+    web_jpg_med_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_med_regex)
+    web_jpg_thumb_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_thumb_regex)
+    """
+    print(web_jpg_pattern)
+    print(web_jpg_med_pattern)
+    print(web_jpg_thumb_pattern)
+    """
+
+    # test image patterns
+    match = None
+    match_dict = None
+    full = web_jpg_pattern.match(text)
+    medium = web_jpg_med_pattern.match(text)
+    thumb = web_jpg_thumb_pattern.match(text)
+
+    if full:
+        match = full
+    elif medium:
+        match = medium
+    elif thumb:
+        match = thumb
+    if match:
+        match_dict = match.groupdict()
+    return match_dict
+
+
+def generate_url_records_suffixes(settings=None):
     """
     This method accounts for suffixes. They will be grouped into a 
     distinct record set with the catalog number.
     This method uses regex to determine the filetype, and 
     ignores the powersort input field 'filetype'.
+
     """
-    global occurrence_set
+    #catalog_number_regex = settings.catalog_number_regex
+    """
+    catalog_number_pattern = re.compile(settings.catalog_number_regex)
+    web_jpg_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_regex)
+    web_jpg_med_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_med_regex)
+    web_jpg_thumb_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_thumb_regex)
+
+    print(web_jpg_pattern)
+    print(web_jpg_med_pattern)
+    print(web_jpg_thumb_pattern)
+    """
+
+    occurrence_set = {}
     with open(input_file, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -163,31 +192,63 @@ def generate_url_records_suffixes():
             result_status = row['result']
             # check if file successfully moved
             if result_status == 'success':
-                if file_type in web_file_types:
-                    # get filename parts
-                    file_path_obj = Path(file_path)
-                    basename = file_path_obj.name
-                    file_name = file_path_obj.stem
-                    file_extension = file_path_obj.suffix
-                    try:
-                        catalog_number = catalog_number_pattern.match(file_name).group(0)
-                        # Create catalog number record if it doesn't exist
-                        if catalog_number not in occurrence_set:
-                            occurrence_set[catalog_number]={'catalog_number': catalog_number}
-                        # Determine if thumbnail, original, or web size
-                        if file_name.endswith(thumb_ext):
-                            occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path)
-                        elif file_name.endswith(medium_ext):
-                            occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path)
-                        else:
-                            occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path)
-                    except AttributeError:
-                        print(f'No match for file_name {file_name} with prefix {file_prefix}')
+                # get filename parts
+                file_path_obj = Path(file_path)
+                basename = file_path_obj.name
+                file_name = file_path_obj.stem
+                file_extension = file_path_obj.suffix
+                
+                catalog_number = catalog_number_pattern.match(file_name).group(0)
+                # Create catalog number record if it doesn't exist
+                if catalog_number not in occurrence_set:
+                    occurrence_set[catalog_number]={'catalog_number': catalog_number}
+                    print(catalog_number)
+                # Determine if thumbnail, original, or web size
+                print(match_pattern(text=basename, settings=settings))
+
+
+                """
+                if web_jpg_pattern.match(file_name).group(0):
+                    print(web_jpg_pattern.match(file_name).group(0))
+                if web_jpg_med_pattern.match(file_name).group(0):
+                    print(web_jpg_med_pattern.match(file_name).group(0))
+                if web_jpg_thumb_pattern.match(file_name).group(0):
+                    print(web_jpg_thumb_pattern.match(file_name).group(0))
+                """
+
+                """
+                if file_name.endswith(thumb_ext):
+                    occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path)
+                elif file_name.endswith(medium_ext):
+                    occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path)
+                else:
+                    occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path)
+                """
+
+    return occurrence_set
 
 if __name__ == '__main__':
-    global occurrence_set
-    occurrence_set = {}
-    generate_url_records()
+    global settings
+    settings = Settings(verbose=verbose)
+    #Load settings from config
+    settings.load_config(config_file=config_file)
+    file_prefix = settings.collection_prefix
+    file_base_path = settings.web_base
+    url_base = settings.url_base
+    #TODO change pattern string to match regex in config file
+    #pattern_string = '(' + file_prefix + '\d+)'
+    pattern_string = settings.catalog_number_regex
+    catalog_number_pattern = re.compile(pattern_string)
+    if settings.verbose:
+        print('file_base_path', file_base_path)
+        print('url_base', url_base)
+        print('pattern_string', pattern_string)
+        print('catalog_number_pattern', catalog_number_pattern)
+
+    #occurrence_set = generate_url_records(file_base_path=file_base_path, url_base=url_base)
+    occurrence_set_suffixes = generate_url_records_suffixes(settings=settings)
+    occurrence_set = occurrence_set_suffixes
+    print(occurrence_set)
     # Get input file name
     input_file_name_stem = Path(input_file).stem
     output_file_name = input_file_name_stem + '_urls.csv'
