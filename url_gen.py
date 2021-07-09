@@ -198,13 +198,37 @@ def generate_url_records_suffixes(settings=None):
                 file_name = file_path_obj.stem
                 file_extension = file_path_obj.suffix
                 
+                """
                 catalog_number = catalog_number_pattern.match(file_name).group(0)
                 # Create catalog number record if it doesn't exist
                 if catalog_number not in occurrence_set:
                     occurrence_set[catalog_number]={'catalog_number': catalog_number}
                     print(catalog_number)
+                """
                 # Determine if thumbnail, original, or web size
-                print(match_pattern(text=basename, settings=settings))
+                print(file_path)
+                result = match_pattern(text=basename, settings=settings)
+                if result:
+                    catalog_number = result['catNum']
+                    suffix = result.get('suffix', None)
+                    size = result.get('size', 'large')
+                    if suffix:
+                        image_set = catalog_number + '_' + suffix
+                    else:
+                        image_set = catalog_number
+                    print(catalog_number, image_set)
+                    # Create image_set record if it doesn't exist
+                    if image_set not in occurrence_set:
+                        occurrence_set[image_set]={'catalog_number': catalog_number}
+                        #print(catalog_number)
+                    if size == 'thumb':
+                        occurrence_set[image_set]['thumbnail'] = generate_url(file_base_path=settings.web_base, file_path=file_path)
+                    if size == 'med':
+                        occurrence_set[image_set]['web'] = generate_url(file_base_path=settings.web_base, file_path=file_path)
+                    if size == 'large':
+                        occurrence_set[image_set]['large'] = generate_url(file_base_path=settings.web_base, file_path=file_path)
+                else:
+                    print('No match:', basename)
 
 
                 """
