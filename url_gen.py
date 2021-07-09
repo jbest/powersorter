@@ -213,6 +213,7 @@ if __name__ == '__main__':
     file_prefix = settings.collection_prefix
     file_base_path = settings.web_base
     url_base = settings.url_base
+    web_base = settings.web_base
 
     pattern_string = settings.catalog_number_regex
     catalog_number_pattern = re.compile(pattern_string)
