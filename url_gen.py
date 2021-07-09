@@ -194,11 +194,11 @@ def generate_url_records_suffixes(settings=None):
                         occurrence_set[image_set]={'catalog_number': catalog_number}
                         #print(catalog_number)
                     if size == 'thumb':
-                        occurrence_set[image_set]['thumbnail'] = generate_url(file_base_path=settings.web_base, file_path=file_path)
+                        occurrence_set[image_set]['thumbnail'] = generate_url(url_base=settings.url_base, file_base_path=settings.web_base, file_path=file_path)
                     if size == 'med':
-                        occurrence_set[image_set]['web'] = generate_url(file_base_path=settings.web_base, file_path=file_path)
+                        occurrence_set[image_set]['web'] = generate_url(url_base=settings.url_base, file_base_path=settings.web_base, file_path=file_path)
                     if size == 'large':
-                        occurrence_set[image_set]['large'] = generate_url(file_base_path=settings.web_base, file_path=file_path)
+                        occurrence_set[image_set]['large'] = generate_url(url_base=settings.url_base, file_base_path=settings.web_base, file_path=file_path)
                 else:
                     if settings.verbose:
                         print('No match:', basename)
@@ -217,10 +217,12 @@ if __name__ == '__main__':
     pattern_string = settings.catalog_number_regex
     catalog_number_pattern = re.compile(pattern_string)
     if settings.verbose:
+        print('settings:')
         print('file_base_path', file_base_path)
         print('url_base', url_base)
         print('pattern_string', pattern_string)
         print('catalog_number_pattern', catalog_number_pattern)
+        print('web_base', web_base)
 
     #occurrence_set = generate_url_records(file_base_path=file_base_path, url_base=url_base)
     occurrence_set = generate_url_records_suffixes(settings=settings)
