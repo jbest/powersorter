@@ -106,45 +106,50 @@ def generate_url(file_base_path=FILE_BASE_PATH, file_path=None, url_base=URL_BAS
     image_url = urljoin(URL_BASE, relative_path)
     return image_url
 
-occurrence_set = {}
-with open(input_file, newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        file_path = row['destination']
-        file_type = row['filetype']
-        result_status = row['result']
-        # check if file successfully moved
-        if result_status == 'success':
-            if file_type in web_file_types:
-                # get filename parts
-                file_path_obj = Path(file_path)
-                basename = file_path_obj.name
-                file_name = file_path_obj.stem
-                file_extension = file_path_obj.suffix
-                try:
-                    catalog_number = catalog_number_pattern.match(file_name).group(0)
-                    # Create catalog number record if it doesn't exist
-                    if catalog_number not in occurrence_set:
-                        occurrence_set[catalog_number]={'catalog_number': catalog_number}
-                    # Determine if thumbnail, original, or web size
-                    if file_name.endswith(thumb_ext):
-                        occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path)
-                    elif file_name.endswith(medium_ext):
-                        occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path)
-                    else:
-                        occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path)
-                except AttributeError:
-                    print(f'No match for file_name {file_name} with prefix {file_prefix}')
+def generate_url_records():
+    global occurrence_set
+    with open(input_file, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            file_path = row['destination']
+            file_type = row['filetype']
+            result_status = row['result']
+            # check if file successfully moved
+            if result_status == 'success':
+                if file_type in web_file_types:
+                    # get filename parts
+                    file_path_obj = Path(file_path)
+                    basename = file_path_obj.name
+                    file_name = file_path_obj.stem
+                    file_extension = file_path_obj.suffix
+                    try:
+                        catalog_number = catalog_number_pattern.match(file_name).group(0)
+                        # Create catalog number record if it doesn't exist
+                        if catalog_number not in occurrence_set:
+                            occurrence_set[catalog_number]={'catalog_number': catalog_number}
+                        # Determine if thumbnail, original, or web size
+                        if file_name.endswith(thumb_ext):
+                            occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path)
+                        elif file_name.endswith(medium_ext):
+                            occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path)
+                        else:
+                            occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path)
+                    except AttributeError:
+                        print(f'No match for file_name {file_name} with prefix {file_prefix}')
 
-# Get input file name
-input_file_name_stem = Path(input_file).stem
-output_file_name = input_file_name_stem + '_urls.csv'
-print('Writing urls to:', output_file_name)
+if __name__ == '__main__':
+    global occurrence_set
+    occurrence_set = {}
+    generate_url_records()
+    # Get input file name
+    input_file_name_stem = Path(input_file).stem
+    output_file_name = input_file_name_stem + '_urls.csv'
+    print('Writing urls to:', output_file_name)
 
-with open(output_file_name, 'w', newline='') as csvfile:
-    fieldnames=['catalog_number', 'large', 'web', 'thumbnail']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
-    for key, image_set in occurrence_set.items():
-        writer.writerow(image_set)
+    with open(output_file_name, 'w', newline='') as csvfile:
+        fieldnames=['catalog_number', 'large', 'web', 'thumbnail']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for key, image_set in occurrence_set.items():
+            writer.writerow(image_set)
 
