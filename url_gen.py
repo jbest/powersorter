@@ -72,6 +72,10 @@ class Settings():
                 self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.web_base = self.collection.get('web_base', None) # path of directory available via HTTP/S
                 self.url_base = self.collection.get('url_base', None) # URL of directory served via HTTP/S
+                self.file_types = config.get('file_types', None)
+                self.web_jpg_regex = self.file_types.get('web_jpg', None).get('file_regex', None)
+                self.web_jpg_med_regex = self.file_types.get('web_jpg_med', None).get('file_regex', None)
+                self.web_jpg_thumb_regex = self.file_types.get('web_jpg_thumb', None).get('file_regex', None)
                 #self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 #self.files = config.get('files', None)
                 #self.folder_increment = int(self.files.get('folder_increment', 1000))
@@ -112,6 +116,43 @@ def generate_url_records():
     overwritten when a file without a suffix is in the record.
     This method does not use regex to determine the filetype, instead
     relies on the powersort input field 'filetype'.
+    """
+    global occurrence_set
+    with open(input_file, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            file_path = row['destination']
+            file_type = row['filetype']
+            result_status = row['result']
+            # check if file successfully moved
+            if result_status == 'success':
+                if file_type in web_file_types:
+                    # get filename parts
+                    file_path_obj = Path(file_path)
+                    basename = file_path_obj.name
+                    file_name = file_path_obj.stem
+                    file_extension = file_path_obj.suffix
+                    try:
+                        catalog_number = catalog_number_pattern.match(file_name).group(0)
+                        # Create catalog number record if it doesn't exist
+                        if catalog_number not in occurrence_set:
+                            occurrence_set[catalog_number]={'catalog_number': catalog_number}
+                        # Determine if thumbnail, original, or web size
+                        if file_name.endswith(thumb_ext):
+                            occurrence_set[catalog_number]['thumbnail'] = generate_url(file_path=file_path)
+                        elif file_name.endswith(medium_ext):
+                            occurrence_set[catalog_number]['web'] = generate_url(file_path=file_path)
+                        else:
+                            occurrence_set[catalog_number]['large'] = generate_url(file_path=file_path)
+                    except AttributeError:
+                        print(f'No match for file_name {file_name} with prefix {file_prefix}')
+
+def generate_url_records_suffixes():
+    """
+    This method accounts for suffixes. They will be grouped into a 
+    distinct record set with the catalog number.
+    This method uses regex to determine the filetype, and 
+    ignores the powersort input field 'filetype'.
     """
     global occurrence_set
     with open(input_file, newline='') as csvfile:
