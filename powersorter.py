@@ -78,7 +78,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
     Will overwrite existing files if force_overwrite_confirmed = True.
     """
     destination = destination_directory.joinpath(filename)
-    if dry_run:
+    if settings.dry_run:
         if destination.exists():
             now = datetime.datetime.now()
             move_success = False
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     # Generate log file name and path
     now = datetime.datetime.now()
     log_filename = settings.collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
-    if dry_run:
+    if settings.dry_run:
         log_filename = log_filename + '_DRY-RUN'
     log_filename = log_filename + '.csv'
     log_file_path = settings.log_directory_path.joinpath(log_filename)
@@ -264,7 +264,7 @@ if __name__ == '__main__':
     except:
         print('ERROR - Unable to retrive username.')
         username = None
-    
+
     csvfile = open(log_file_path, 'w', newline='')
     fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
