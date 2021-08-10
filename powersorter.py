@@ -147,12 +147,38 @@ def arg_setup():
     args = vars(ap.parse_args())
     return args
 
-def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
+def sort(input_path=None, log_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
     collection_prefix=None, file_types=None, destination_base_path=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
     global sorted_file_count
     global unmoved_file_count # files matching pattern, but not moved/sorted
+
+    if log_path:
+        log_file_path = log_path
+    else:
+        # Generate log file name and path
+        now = datetime.datetime.now()
+        input_path = Path(settings.files.get('input_path', None))
+        log_filename = '_'.join([settings.collection_prefix, input_path.stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
+        if settings.dry_run:
+            log_filename = log_filename + '_DRY-RUN'
+        log_filename = log_filename + '.csv'
+        log_file_path = settings.log_directory_path.joinpath(log_filename)
+
+        # Open log file
+        csvfile = open(log_file_path, 'w', newline='')
+        fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+    # get current username
+    try:
+        username = pwd.getpwuid(os.getuid()).pw_name
+    except:
+        print('ERROR - Unable to retrive username.')
+        username = None
+
     for file_type, value in file_types.items():
         #print('file_type', file_type, 'value', value)
         #regex = value.get('regex', None)
@@ -249,7 +275,8 @@ if __name__ == '__main__':
     if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
         print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
         sys.exit()
-
+"""
+moving to sort function
     # Generate log file name and path
     now = datetime.datetime.now()
     input_path = Path(settings.files.get('input_path', None))
@@ -258,19 +285,23 @@ if __name__ == '__main__':
         log_filename = log_filename + '_DRY-RUN'
     log_filename = log_filename + '.csv'
     log_file_path = settings.log_directory_path.joinpath(log_filename)
-
+"""
+"""
+Moving to sort function
     # get current username
     try:
         username = pwd.getpwuid(os.getuid()).pw_name
     except:
         print('ERROR - Unable to retrive username.')
         username = None
-
+"""
+"""
+Moving to sort function
     csvfile = open(log_file_path, 'w', newline='')
     fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
-
+"""
     #input_path = Path(settings.files.get('input_path', None))
     #print(settings.catalog_number_regex)
     # start sorting
