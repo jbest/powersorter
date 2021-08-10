@@ -252,7 +252,8 @@ if __name__ == '__main__':
 
     # Generate log file name and path
     now = datetime.datetime.now()
-    log_filename = settings.collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
+    input_path = Path(settings.files.get('input_path', None))
+    log_filename = '_'.join([settings.collection_prefix, input_path.stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
     if settings.dry_run:
         log_filename = log_filename + '_DRY-RUN'
     log_filename = log_filename + '.csv'
@@ -270,7 +271,7 @@ if __name__ == '__main__':
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
 
-    input_path = Path(settings.files.get('input_path', None))
+    #input_path = Path(settings.files.get('input_path', None))
     #print(settings.catalog_number_regex)
     # start sorting
     sort(input_path=input_path, \
