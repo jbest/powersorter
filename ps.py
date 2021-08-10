@@ -46,7 +46,8 @@ if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
 input_path = Path(settings.files.get('input_path', None))
 #print(settings.catalog_number_regex)
 # start sorting
-sort_results = powersorter.sort(input_path=input_path, \
+sort_results = powersorter.sort(settings=settings, \
+    input_path=input_path, \
     number_pad=settings.number_pad, \
     folder_increment=settings.folder_increment, \
     catalog_number_regex=settings.catalog_number_regex,\
@@ -59,4 +60,4 @@ print('SORT COMPLETE')
 if verbose:
     print('sorted_file_count', sort_results['sorted_file_count'])
     print('unmoved_file_count', sort_results['unmoved_file_count'])
-print('Log file written to:', log_file_path)
+#print('Log file written to:', log_file_path)
