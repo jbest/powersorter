@@ -151,8 +151,8 @@ def sort(input_path=None, log_path=None, number_pad=None, folder_increment=None,
     collection_prefix=None, file_types=None, destination_base_path=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
-    global sorted_file_count
-    global unmoved_file_count # files matching pattern, but not moved/sorted
+    sorted_file_count = 0
+    unmoved_file_count = 0 # files matching pattern, but not moved/sorted
 
     if log_path:
         log_file_path = log_path
@@ -166,11 +166,11 @@ def sort(input_path=None, log_path=None, number_pad=None, folder_increment=None,
         log_filename = log_filename + '.csv'
         log_file_path = settings.log_directory_path.joinpath(log_filename)
 
-        # Open log file
-        csvfile = open(log_file_path, 'w', newline='')
-        fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+    # Open log file
+    csvfile = open(log_file_path, 'w', newline='')
+    fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
 
     # get current username
     try:
@@ -199,9 +199,11 @@ def sort(input_path=None, log_path=None, number_pad=None, folder_increment=None,
                 output_path=output_path)
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
+    csvfile.close()
+    return {'sorted_file_count':sorted_file_count, 'unmoved_file_count':unmoved_file_count}
 
 class Settings():
-    def __init__(self, prefix=None, dry_run=None, verbose=None, force_overwrite=None):
+    def __init__(self, prefix=None, dry_run=None, verbose=None, force_over_write=None):
         self.prefix = prefix
         self.dry_run = dry_run
         self.verbose = verbose
@@ -312,7 +314,10 @@ Moving to sort function
         collection_prefix=settings.collection_prefix, \
         file_types=settings.file_types, \
         destination_base_path=settings.output_base_path)
+"""
+moved to sort function
     csvfile.close()
+"""
     # Summary report
     print('SORT COMPLETE')
     if verbose:

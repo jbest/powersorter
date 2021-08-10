@@ -10,9 +10,6 @@ import powersorter
 
 
 CONFIG_FORMAT_REQUIRED = '3.0'
-sorted_file_count = 0
-unmoved_file_count = 0
-
 
 # initialize settings
 # set up argparse and get arguments
@@ -46,40 +43,20 @@ if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
     print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
     sys.exit()
 
-# Generate log file name and path
-now = datetime.datetime.now()
-log_filename = settings.collection_prefix + '_' + str(now.strftime('%Y-%m-%dT%H%M%S'))
-if settings.dry_run:
-    log_filename = log_filename + '_DRY-RUN'
-log_filename = log_filename + '.csv'
-log_file_path = settings.log_directory_path.joinpath(log_filename)
-
-# get current username
-try:
-    username = pwd.getpwuid(os.getuid()).pw_name
-except:
-    print('ERROR - Unable to retrive username.')
-    username = None
-
-csvfile = open(log_file_path, 'w', newline='')
-fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
-writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-writer.writeheader()
-
 input_path = Path(settings.files.get('input_path', None))
 #print(settings.catalog_number_regex)
 # start sorting
-powersorter.sort(input_path=input_path, \
+sort_results = powersorter.sort(input_path=input_path, \
     number_pad=settings.number_pad, \
     folder_increment=settings.folder_increment, \
     catalog_number_regex=settings.catalog_number_regex,\
     collection_prefix=settings.collection_prefix, \
     file_types=settings.file_types, \
     destination_base_path=settings.output_base_path)
-csvfile.close()
+
 # Summary report
 print('SORT COMPLETE')
 if verbose:
-    print('sorted_file_count', sorted_file_count)
-    print('unmoved_file_count', unmoved_file_count)
+    print('sorted_file_count', sort_results['sorted_file_count'])
+    print('unmoved_file_count', sort_results['unmoved_file_count'])
 print('Log file written to:', log_file_path)
