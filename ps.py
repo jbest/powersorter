@@ -38,7 +38,8 @@ input_path = settings.input_path
 
 # start sorting
 print('STARTING')
-sort_results = powersorter.sort(settings=settings, \
+sort_results = powersorter.sort(
+    settings_obj=settings, \
     input_path=input_path, \
     number_pad=settings.number_pad, \
     folder_increment=settings.folder_increment, \

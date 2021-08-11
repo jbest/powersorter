@@ -38,6 +38,9 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
     Sort and move files into correct directory based on
     file pattern and directory name increments
     """
+    #global settings
+    global settings
+
     sorted_file_count = 0
     unmoved_file_count = 0    
     for file in files:
@@ -73,6 +76,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
     Creates destination directory if it does not exist.
     Will overwrite existing files if force_overwrite_confirmed = True.
     """
+    global settings
     destination = destination_directory.joinpath(filename)
     if settings.dry_run:
         if destination.exists():
@@ -143,12 +147,17 @@ def arg_setup():
     args = vars(ap.parse_args())
     return args
 
-def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
+def sort(settings_obj=None, input_path=None, log_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
     collection_prefix=None, file_types=None, destination_base_path=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
+    global settings
+    if settings_obj:
+        settings = settings_obj
+        
     sorted_file_count = 0
     unmoved_file_count = 0 # files matching pattern, but not moved/sorted
+    #global settings
 
     # change input_path into Path object
     if input_path:
@@ -197,7 +206,9 @@ def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_
             print(f'Unable to write to directory: {output_path}')
         else:
             file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
-            sort_result = sort_files(files=file_matches, \
+            sort_result = sort_files(
+                #settings=settings, \
+                files=file_matches, \
                 number_pad=number_pad, \
                 folder_increment=folder_increment, \
                 collection_prefix=collection_prefix, \
@@ -289,8 +300,10 @@ if __name__ == '__main__':
     input_path = settings.input_path
 
     # start sorting
-    sort_results = sort(settings=settings, \
+    sort_results = sort(
+        #settings=settings, \
         #input_path=input_path, \
+        settings_obj = settings, \
         number_pad=settings.number_pad, \
         folder_increment=settings.folder_increment, \
         catalog_number_regex=settings.catalog_number_regex,\
