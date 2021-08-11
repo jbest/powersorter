@@ -193,6 +193,7 @@ class Settings():
                 self.collection_prefix = self.collection.get('prefix', None)
                 self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.files = config.get('files', None)
+                self.input_path = self.files.get('input_path', None)
                 self.folder_increment = int(self.files.get('folder_increment', 1000))
                 self.log_directory_path = Path(self.files.get('log_directory_path', None))
                 self.number_pad = int(self.files.get('number_pad', 7))
@@ -252,7 +253,7 @@ if __name__ == '__main__':
 
     # Generate log file name and path
     now = datetime.datetime.now()
-    input_path = Path(settings.files.get('input_path', None))
+    input_path = Path(settings.input_path)
     log_filename = '_'.join([settings.collection_prefix, input_path.stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
     if settings.dry_run:
         log_filename = log_filename + '_DRY-RUN'
