@@ -151,7 +151,12 @@ def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_
     unmoved_file_count = 0 # files matching pattern, but not moved/sorted
 
     # change input_path into Path object
-    input_path = Path(input_path)
+    if input_path:
+        # input_path was overridden or explicitly passed
+        input_path = Path(input_path)
+    else:
+        # default to input_path in config file
+        input_path = Path(settings.input_path)
 
     if log_path:
         log_file_path = log_path
@@ -283,14 +288,9 @@ if __name__ == '__main__':
     settings.load_config(config_file=config_file)
     input_path = settings.input_path
 
-    # Check required config_file version
-    if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
-        print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
-        sys.exit()
-
     # start sorting
     sort_results = sort(settings=settings, \
-        input_path=input_path, \
+        #input_path=input_path, \
         number_pad=settings.number_pad, \
         folder_increment=settings.folder_increment, \
         catalog_number_regex=settings.catalog_number_regex,\

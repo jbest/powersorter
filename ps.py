@@ -31,8 +31,10 @@ settings = powersorter.Settings(dry_run=dry_run, verbose=verbose, force_overwrit
 #Load settings from config file
 settings.load_config(config_file=config_file)
 
-input_path = settings.input_path
 # input_path setting in config file can be overridden using value passed in args input_path_override
+# getting path from settings isn't necessary, just here for illustration
+# if input_path isn't passed to sort, it will use settings.input_path by default
+input_path = settings.input_path 
 
 # start sorting
 print('STARTING')
