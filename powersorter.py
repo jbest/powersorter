@@ -79,14 +79,14 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             now = datetime.datetime.now()
             move_success = False
             status = 'DRY-RUN - simulated move'
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
+            settings.writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
                 'filetype': filetype, 'source': source, 'destination': destination})
         else:
             print('DRY-RUN: Moved:', destination)
             status = 'DRY-RUN - simulated move'
             move_success = True
             now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
+            settings.writer.writerow({'timestamp': now, 'username': settings.username, 'action': 'DRY_RUN-move', 'result': 'success', \
                 'filetype': filetype, 'source': source, 'destination': destination})
     else:
         # Create directory path if it doesn't exist
@@ -100,7 +100,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             status = 'fail'
             details = 'filename exists'
             now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
+            settings.writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
                 'filetype': filetype, 'source': source, 'destination': destination})
         else:
             try:
@@ -118,7 +118,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                 details = 'PermissionError'
                 move_success = False
             now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, \
+            settings.writer.writerow({'timestamp': now, 'username': username, \
                 'action': 'move', 'result': status, 'details': details, \
                 'filetype': filetype, 'source': source, 'destination': destination})
             if verbose:
@@ -172,17 +172,17 @@ def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_
         log_file_path = settings.log_directory_path.joinpath(log_filename)
 
     # Open log file
-    csvfile = open(log_file_path, 'w', newline='')
+    settings.csvfile = open(log_file_path, 'w', newline='')
     fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
+    settings.writer = csv.DictWriter(settings.csvfile, fieldnames=fieldnames)
+    settings.writer.writeheader()
 
     # get current username
     try:
-        username = pwd.getpwuid(os.getuid()).pw_name
+        settings.username = pwd.getpwuid(os.getuid()).pw_name
     except:
         print('ERROR - Unable to retrive username.')
-        username = None
+        settings.username = None
 
     for file_type, value in file_types.items():
         #print('file_type', file_type, 'value', value)
@@ -204,7 +204,7 @@ def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_
                 output_path=output_path)
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
-    csvfile.close()
+    settings.csvfile.close()
     return {'sorted_file_count':sorted_file_count, 'unmoved_file_count':unmoved_file_count, 'log_file_path':log_file_path}
 
 class Settings():
