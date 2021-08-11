@@ -11,8 +11,6 @@ import datetime
 import sys
 
 CONFIG_FORMAT_REQUIRED = '3.0'
-sorted_file_count = 0
-unmoved_file_count = 0
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -290,8 +288,6 @@ if __name__ == '__main__':
         print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
         sys.exit()
 
-    
-    #print(settings.catalog_number_regex)
     # start sorting
     sort_results = sort(settings=settings, \
         input_path=input_path, \
