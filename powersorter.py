@@ -223,12 +223,20 @@ class Settings():
                 self.collection_prefix = self.collection.get('prefix', None)
                 self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.files = config.get('files', None)
+                self.input_path = self.files.get('input_path', None)
                 self.folder_increment = int(self.files.get('folder_increment', 1000))
                 self.log_directory_path = Path(self.files.get('log_directory_path', None))
                 self.number_pad = int(self.files.get('number_pad', 7))
                 self.output_base_path = Path(self.files.get('output_base_path', None))
                 # Get the type of files and patterns that will be scanned and sorted
                 self.file_types = config.get('file_types', None)
+            # Check required config_file version
+            if not str(self.config_format) == CONFIG_FORMAT_REQUIRED:
+                print('Wrong config format version:', self.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
+                raise ValueError('Wrong configuraion version.')
+                #sys.exit()
+
+
     
 if __name__ == '__main__':
     # initialize settings
@@ -258,6 +266,7 @@ if __name__ == '__main__':
             print('Terminating script.')
             quit()
     """
+
     #Confirm force overwrite
     force_overwrite_confirmed = False
     if force_overwrite:
@@ -274,16 +283,17 @@ if __name__ == '__main__':
     settings = Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
     #Load settings from config
     settings.load_config(config_file=config_file)
+    input_path = settings.input_path
 
     # Check required config_file version
     if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
         print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
         sys.exit()
 
-    #input_path = Path(settings.files.get('input_path', None))
+    
     #print(settings.catalog_number_regex)
     # start sorting
-    sort(settings=settings, \
+    sort_results = sort(settings=settings, \
         input_path=input_path, \
         number_pad=settings.number_pad, \
         folder_increment=settings.folder_increment, \
@@ -295,6 +305,6 @@ if __name__ == '__main__':
     # Summary report
     print('SORT COMPLETE')
     if verbose:
-        print('sorted_file_count', sorted_file_count)
-        print('unmoved_file_count', unmoved_file_count)
-    print('Log file written to:', log_file_path)
+        print('sorted_file_count', sort_results['sorted_file_count'])
+        print('unmoved_file_count', sort_results['unmoved_file_count'])
+    print('Log file written to:', sort_results['log_file_path'])

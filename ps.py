@@ -2,16 +2,8 @@
 Sample of using powersorter.py as an imported module.
 
 """
-#import datetime
-#import csv
-#from pathlib import Path
-
 import powersorter
 
-
-CONFIG_FORMAT_REQUIRED = '3.0'
-
-# initialize settings
 # set up argparse and get arguments
 args = powersorter.arg_setup()
 
@@ -34,22 +26,17 @@ if force_overwrite:
         force_overwrite_confirmed = False
         sys.exit()
 
+#Initialize settings with arg parameters
 settings = powersorter.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
-#Load settings from config
+#Load settings from config file
 settings.load_config(config_file=config_file)
 
-# Check required config_file version
-if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
-    print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
-    sys.exit()
-
-#input_path = Path(settings.files.get('input_path', None))
 input_path = settings.input_path
-#print(settings.catalog_number_regex)
+# input_path setting in config file can be overridden using value passed in args input_path_override
+
 # start sorting
 print('STARTING')
 sort_results = powersorter.sort(settings=settings, \
-    #input_path=input_path, \
     input_path=input_path, \
     number_pad=settings.number_pad, \
     folder_increment=settings.folder_increment, \
