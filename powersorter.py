@@ -83,7 +83,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             now = datetime.datetime.now()
             move_success = False
             status = 'DRY-RUN - simulated move'
-            settings.writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
+            settings.writer.writerow({'timestamp': now, 'username': settings.username, 'action': 'DRY_RUN-move', 'result': 'fail', \
                 'filetype': filetype, 'source': source, 'destination': destination})
         else:
             print('DRY-RUN: Moved:', destination)
@@ -104,7 +104,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             status = 'fail'
             details = 'filename exists'
             now = datetime.datetime.now()
-            settings.writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
+            settings.writer.writerow({'timestamp': now, 'username': settings.username, 'action': 'move', 'result': status, 'details': details,\
                 'filetype': filetype, 'source': source, 'destination': destination})
         else:
             try:
@@ -122,10 +122,10 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                 details = 'PermissionError'
                 move_success = False
             now = datetime.datetime.now()
-            settings.writer.writerow({'timestamp': now, 'username': username, \
+            settings.writer.writerow({'timestamp': now, 'username': settings.username, \
                 'action': 'move', 'result': status, 'details': details, \
                 'filetype': filetype, 'source': source, 'destination': destination})
-            if verbose:
+            if settings.verbose:
                 print('Move:', destination, status)    
     return {'move_success': move_success, 'status': status}
 
