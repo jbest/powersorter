@@ -2,9 +2,9 @@
 Sample of using powersorter.py as an imported module.
 
 """
-import datetime
-import csv
-from pathlib import Path
+#import datetime
+#import csv
+#from pathlib import Path
 
 import powersorter
 
@@ -43,10 +43,13 @@ if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
     print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
     sys.exit()
 
-input_path = Path(settings.files.get('input_path', None))
+#input_path = Path(settings.files.get('input_path', None))
+input_path = settings.input_path
 #print(settings.catalog_number_regex)
 # start sorting
+print('STARTING')
 sort_results = powersorter.sort(settings=settings, \
+    #input_path=input_path, \
     input_path=input_path, \
     number_pad=settings.number_pad, \
     folder_increment=settings.folder_increment, \
@@ -60,4 +63,4 @@ print('SORT COMPLETE')
 if verbose:
     print('sorted_file_count', sort_results['sorted_file_count'])
     print('unmoved_file_count', sort_results['unmoved_file_count'])
-#print('Log file written to:', log_file_path)
+print('Log file written to:', sort_results['log_file_path'])

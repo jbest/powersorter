@@ -10,8 +10,6 @@ import argparse
 import datetime
 import sys
 
-print('STARTING')
-
 CONFIG_FORMAT_REQUIRED = '3.0'
 sorted_file_count = 0
 unmoved_file_count = 0
@@ -154,6 +152,9 @@ def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_
     sorted_file_count = 0
     unmoved_file_count = 0 # files matching pattern, but not moved/sorted
 
+    # change input_path into Path object
+    input_path = Path(input_path)
+
     if log_path:
         log_file_path = log_path
     else:
@@ -201,7 +202,7 @@ def sort(settings=None, input_path=None, log_path=None, number_pad=None, folder_
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
     csvfile.close()
-    return {'sorted_file_count':sorted_file_count, 'unmoved_file_count':unmoved_file_count}
+    return {'sorted_file_count':sorted_file_count, 'unmoved_file_count':unmoved_file_count, 'log_file_path':log_file_path}
 
 class Settings():
     def __init__(self, prefix=None, dry_run=None, verbose=None, force_overwrite=None):
