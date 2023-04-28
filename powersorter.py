@@ -218,16 +218,6 @@ if __name__ == '__main__':
     else:
         input_path = None
 
-    # Check existence of input path
-    if input_path:
-        # test to ensure input directory exists
-        if input_path.is_dir():
-            print('Sorting files from input_path:', input_path)
-        else:
-            print(f'ERROR: directory {input_path} does not exist.')
-            print('Terminating script.')
-            quit()
-
     #Confirm force overwrite
     force_overwrite_confirmed = False
     if force_overwrite:
@@ -255,6 +245,17 @@ if __name__ == '__main__':
     # use input_path arg or load from config settings
     if not input_path:
         input_path = Path(settings.input_path)
+
+    # Check existence of input path
+    if input_path:
+        # test to ensure input directory exists
+        if input_path.is_dir():
+            print('Sorting files from input_path:', input_path)
+        else:
+            print(f'ERROR: directory {input_path} does not exist.')
+            print('Terminating script.')
+            quit()
+
     log_filename = '_'.join([settings.collection_prefix, input_path.stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
     if settings.dry_run:
         log_filename = log_filename + '_DRY-RUN'
