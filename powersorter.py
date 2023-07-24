@@ -212,23 +212,12 @@ if __name__ == '__main__':
     force_overwrite = args['force']
     input_path_override = args['input_path']
 
-    """
-    #TODO reactivate input path override
+    # use input_path arg to override input_path in config file
     if input_path_override:
         input_path = Path(input_path_override)
     else:
-        input_path = Path(files.get('input_path', None))
+        input_path = None
 
-    # Check existence of input path
-    if input_path:
-        # test to ensure input directory exists
-        if input_path.is_dir():
-            print('Sorting files from input_path:', input_path)
-        else:
-            print(f'ERROR: directory {input_path} does not exist.')
-            print('Terminating script.')
-            quit()
-    """
     #Confirm force overwrite
     force_overwrite_confirmed = False
     if force_overwrite:
@@ -253,7 +242,20 @@ if __name__ == '__main__':
 
     # Generate log file name and path
     now = datetime.datetime.now()
-    input_path = Path(settings.input_path)
+    # use input_path arg or load from config settings
+    if not input_path:
+        input_path = Path(settings.input_path)
+
+    # Check existence of input path
+    if input_path:
+        # test to ensure input directory exists
+        if input_path.is_dir():
+            print('Sorting files from input_path:', input_path)
+        else:
+            print(f'ERROR: directory {input_path} does not exist.')
+            print('Terminating script.')
+            quit()
+
     log_filename = '_'.join([settings.collection_prefix, input_path.stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
     if settings.dry_run:
         log_filename = log_filename + '_DRY-RUN'
