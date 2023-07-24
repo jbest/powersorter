@@ -150,12 +150,22 @@ def match_pattern(text=None, settings=None):
     web_jpg_med_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_med_regex)
     web_jpg_thumb_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_thumb_regex)
 
+    #print(web_jpg_pattern)
+
     # test image patterns
+
     match = None
     match_dict = None
     full = web_jpg_pattern.match(text)
     medium = web_jpg_med_pattern.match(text)
     thumb = web_jpg_thumb_pattern.match(text)
+    """
+    print('text:', text)
+    print('full:', full)
+    print('medium:', medium)
+    print('thumb:', thumb)
+    print('\n')
+    """
 
     if full:
         match = full
@@ -165,6 +175,8 @@ def match_pattern(text=None, settings=None):
         match = thumb
     if match:
         match_dict = match.groupdict()
+    #print('match:', match)
+
     return match_dict
 
 
