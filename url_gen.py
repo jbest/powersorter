@@ -193,7 +193,9 @@ def generate_url_records_suffixes(settings=None):
 
                 # Determine if thumbnail, original, or web size
                 result = match_pattern(text=basename, settings=settings)
+
                 if result:
+                    #print(result)
                     catalog_number = result['catNum']
                     suffix = result.get('suffix', None)
                     size = result.get('size', 'large')
