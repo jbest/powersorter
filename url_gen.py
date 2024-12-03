@@ -69,6 +69,7 @@ class Settings():
                 self.versions = config.get('versions', None)
                 self.config_format = self.versions.get('config_format')
                 self.collection = config.get('collection', None)
+                self.collection_name = self.collection.get('name', None)
                 self.collection_prefix = self.collection.get('prefix', None)
                 self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.web_base = self.collection.get('web_base', None) # path of directory available via HTTP/S
