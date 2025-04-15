@@ -14,7 +14,7 @@ import os
 import glob
 import csv
 import re
-from wand.image import Image
+#from wand.image import Image
 from collections import Counter
 Problem = []
 
