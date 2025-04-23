@@ -144,7 +144,7 @@ deriv_values = {
     settings.load_config(config_file=config_file)
 """
 
-def generate_derivatives(path, settings):
+def generate_derivatives_CLAY(path, settings):
     '''
     Takes a path, makes both deriv types from this img using wand.Image.
     Saves right back where the Orig was located.
@@ -173,7 +173,7 @@ def generate_derivatives(path, settings):
 #THUMBNAIL_SIZE = (390, 390)
     
 #def process_image(image_path, medium_size, thumb_size):
-def process_image(image_path, medium_size=(900, 900), thumb_size=(390, 390)):
+def generate_derivatives(image_path, medium_size=(900, 900), thumb_size=(390, 390)):
     """Process a single image, creating medium and thumbnail versions."""
     try:
         # Check if output files already exist
@@ -430,7 +430,9 @@ def main():
                     print(f' - generating {len(needs_derivs)} x2 derivs (will take a bit)')
                     for i in needs_derivs:
                         #print(i)
-                        generate_derivatives(i, settings)
+                        #generate_derivatives(i, settings)
+                        generate_derivatives(image_path = i)
+
                 elif len(med_glob) < 1:
                     print(f' med derivs req')
                 elif len(thu_glob) < 1:
@@ -507,7 +509,8 @@ def main():
                 print(f' - generating {len(needs_derivs)} x2 derivs (will take a bit)')
                 for i in needs_derivs:
                     #print(i)
-                    generate_derivatives(i, settings)
+                    #generate_derivatives(i, settings)
+                    generate_derivatives(image_path = i)
             elif len(med_glob) < 1:
                 print(f' med derivs req')
             elif len(thu_glob) < 1:
