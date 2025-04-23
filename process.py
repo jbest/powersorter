@@ -15,6 +15,7 @@ import glob
 import csv
 import re
 #from wand.image import Image
+from PIL import Image
 from collections import Counter
 Problem = []
 
@@ -135,6 +136,14 @@ deriv_values = {
     'THUMB': {'DESIGNATOR' : '_thumb', 'SIZE' : 'x390'},
     'MED' : {'DESIGNATOR' : '_med', 'SIZE' : 'x900'}}
 
+# process.py - Clay's approach, requires ImageMagick
+
+"""
+    settings = powersorter.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
+    #Load settings from config file
+    settings.load_config(config_file=config_file)
+"""
+
 def generate_derivatives(path, settings):
     '''
     Takes a path, makes both deriv types from this img using wand.Image.
@@ -157,6 +166,54 @@ def generate_derivatives(path, settings):
             print('Unable to create derivative:', e)
             Problem.append(e)
             #return None
+
+# generate_derivatives.py - Jason's adapted approach, uses Pillow or PIL
+# Default sizes
+#MEDIUM_SIZE = (900, 900)
+#THUMBNAIL_SIZE = (390, 390)
+    
+#def process_image(image_path, medium_size, thumb_size):
+def process_image(image_path, medium_size=(900, 900), thumb_size=(390, 390)):
+    """Process a single image, creating medium and thumbnail versions."""
+    try:
+        # Check if output files already exist
+        file_path = Path(image_path)
+        file_stem = file_path.stem
+        file_dir = file_path.parent
+        
+        medium_path = file_dir / f"{file_stem}_med{file_path.suffix}"
+        thumb_path = file_dir / f"{file_stem}_thumb{file_path.suffix}"
+        
+        # Skip if both output files already exist
+        if medium_path.exists() and thumb_path.exists():
+            print(f"Skipping existing images for {image_path}")
+            return True
+        
+        # Open and process the image
+        with Image.open(image_path) as img:
+            # Create medium size image
+            if not medium_path.exists():
+                medium_img = img.copy()
+                medium_img.thumbnail(medium_size, Image.LANCZOS)
+                medium_img.save(medium_path, "JPEG", quality=85)
+                print(f"Created medium image: {medium_path}")
+            
+            # Create thumbnail
+            if not thumb_path.exists():
+                thumb_img = img.copy()
+                thumb_img.thumbnail(thumb_size, Image.LANCZOS)
+                thumb_img.save(thumb_path, "JPEG", quality=75)
+                print(f"Created thumbnail: {thumb_path}")
+            
+        return True
+    
+    except Exception as e:
+        #print(f"Error processing {image_path}: {str(e)}")
+        print('Unable to create derivative:', e)
+        Problem.append(e)
+        return False
+
+# End updated process_images
 
 def zip_survey(inp):
     '''
