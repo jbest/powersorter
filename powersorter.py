@@ -113,13 +113,17 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                     if verbose:
                         print('Overwritting:', destination)  
                 else:
-                    details = None
+                    details = 'destination.exists = FALSE'
                 shutil.move(source, destination)
                 status = 'success'
                 move_success = True
             except PermissionError:
                 status = 'fail'
                 details = 'PermissionError'
+                move_success = False
+            except Exception as e:
+                status = 'fail'
+                details = str(e)
                 move_success = False
             now = datetime.datetime.now()
             writer.writerow({'timestamp': now, 'username': username, \
