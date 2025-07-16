@@ -1,0 +1,31 @@
+regex notes
+
+
+master jpeg
+^(?<prefix>BRIT)(?<numerical>\d+)(\.)(?i)(?<ext>jpg|jpeg)
+
+DNG
+^(?<prefix>BRIT)(?<numerical>\d+)(\.)(?i)(?<ext>DNG)
+
+other raw
+^(?<prefix>BRIT)(?<numerical>\d+)(\.)(?i)(?<ext>CR2)
+^(?<prefix>BRIT)(?<numerical>\d+)(\.)(?i)(?<ext>NEF)
+
+derivatives
+^(?<prefix>BRIT)(?<numerical>\d+)(?<delimiter>_)(?<size>med|thumb)(\.)(?<ext>.+)
+
+OCR
+^(?<prefix>BRIT)(?<numerical>\d+)(?<delimiter>_)(?<ocr>ocr)(\.)(?<ext>.+)
+
+
+Test strings
+BRIT1000.jpg
+BRIT1000.JPG
+BRIT1000.JPEG
+BRIT1000_med.jpg
+BRIT1000_thumb.jpg
+BRIT1000.DNG
+BRIT1000.cr2
+BRIT1000.nef
+BRIT1000_ocr.txt
+BRIT1000_ocr.json
