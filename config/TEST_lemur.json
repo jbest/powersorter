@@ -1,0 +1,31 @@
+{
+    "collection": {
+        "name": "BRIT",
+        "prefix": "BRIT"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/media/jbest/data/git/powersorter/",
+        "output_base_path": "/media/jbest/data/git/powersorter/",
+        "input_path": "/media/jbest/data/git/powersorter/input_dir/"
+    },
+    "file_types": {
+        "web_jpg": {
+            "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/"
+        },
+        "web_derivs": {
+            "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(?P<delimiter>_)(?P<size>med|thumb)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/"
+        },
+        "archive_dng": {
+            "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>DNG)",
+            "output_sub_path": "archive/"
+        },
+        "ocr": {
+            "regex": "(?P<prefix>BRIT)(?P<numerical>\\d+)(?P<delimiter>_)(?P<ocr>ocr)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/"
+        }
+    }
+}
