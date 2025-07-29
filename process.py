@@ -1,9 +1,14 @@
-import powersorter as ps
-import image_resizer
-
 import csv
 import argparse
 import datetime
+import sys
+
+import powersorter as ps
+import image_resizer
+
+
+
+CONFIG_FORMAT_REQUIRED = '3.0'
 
 def arg_setup():
     # set up argument parser
@@ -21,7 +26,7 @@ def arg_setup():
     args = vars(ap.parse_args())
     return args
 
-# gather args
+# gather args and settings
 
 
 # create config
@@ -44,17 +49,41 @@ if __name__ == '__main__':
     verbose = args['verbose']
     force_overwrite = args['force']
     input_path_override = args['input_path']
-    #TODO implement prompt to confirm force_overwrite
-    force_overwrite_confirmed = False
 
     # create settings based on args and config file
+    #settings = ps.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
+    #Load settings from config
+    #settings.load_config(config_file=config_file)
+
+    # use input_path arg to override input_path in config file
+    if input_path_override:
+        input_path = Path(input_path_override)
+    else:
+        input_path = None
+
+    #Confirm force overwrite
+    force_overwrite_confirmed = False
+    if force_overwrite:
+        print('Files with identical names will be overwritten if you proceed.')
+        response = input('Type \'overwrite\' and [RETURN/ENTER] to confirm desire to overwrite files: ')
+        if response == 'overwrite':
+            print('Will overwrite duplicate file names...')
+            force_overwrite_confirmed = True
+        else:
+            print('Overwrite not confirmed. Exiting...')
+            force_overwrite_confirmed = False
+            sys.exit()
+
     settings = ps.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
     #Load settings from config
     settings.load_config(config_file=config_file)
 
+    # Check required config_file version
+    if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
+        print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
+        sys.exit()
+
     #show settings for testing
     attrs = vars(settings)
-    # {'kids': 0, 'name': 'Dog', 'color': 'Spotted', 'age': 10, 'legs': 2, 'smell': 'Alot'}
-    # now dump this in some way or another
-    print(', '.join("%s: %s" % item for item in attrs.items()))
-    #print(vars(settings))
+    print('Args:')
+    print('\n'.join("%s: %s" % item for item in attrs.items()))
