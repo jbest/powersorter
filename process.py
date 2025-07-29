@@ -78,14 +78,15 @@ if __name__ == '__main__':
     # generate derivs
     #TODO add arg to generate derivs
     # use input path
-    print('Will generate derivs for files at:')
-    print(settings.input_path)
+    #print('Will generate derivs for files at:')
+    #print(settings.input_path)
     # process input_path
     #TODO provide extensions to process (currently hard coded in image_resizer.py)
     #TODO pass values for rezie based on cofig params
     #TODO make image_resizer silent/not verbose
     #TODO make image_resizer process files that match regex, not whole directory
-
+    #TODO instead of using regex, just use the process_folder and exclude files ending in _med and _thumb
+    
     for file_type, value in settings.file_types.items():
         #print('file_type', file_type, 'value', value)
         #regex = value.get('regex', None)
@@ -100,7 +101,7 @@ if __name__ == '__main__':
             print(f'Unable to write to directory: {output_path}')
         else:
             # TEMP
-            print(f'Will scan files, input_path:{settings.input_path}, pattern:{regex}, file_type:{file_type}')
+            #print(f'Will scan files, input_path:{settings.input_path}, pattern:{regex}, file_type:{file_type}')
             file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
             """
             sort_result = sort_files(files=file_matches, \
@@ -111,7 +112,10 @@ if __name__ == '__main__':
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
             """
-            print(file_matches)
+            #print(file_matches)
+            for match in file_matches:
+                #if match.file_path:
+                print(match['file_path'])
 
     #file_matches = ps.scan_files(path=settings.input_path, pattern=settings.regex, file_type=settings.file_types)
     #derivs.process_folder(settings.input_path)
