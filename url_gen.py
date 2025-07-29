@@ -69,7 +69,6 @@ class Settings():
                 self.versions = config.get('versions', None)
                 self.config_format = self.versions.get('config_format')
                 self.collection = config.get('collection', None)
-                self.collection_name = self.collection.get('name', None)
                 self.collection_prefix = self.collection.get('prefix', None)
                 self.catalog_number_regex = self.collection.get('catalog_number_regex', None)
                 self.web_base = self.collection.get('web_base', None) # path of directory available via HTTP/S
@@ -151,12 +150,22 @@ def match_pattern(text=None, settings=None):
     web_jpg_med_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_med_regex)
     web_jpg_thumb_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_thumb_regex)
 
+    #print(web_jpg_pattern)
+
     # test image patterns
+
     match = None
     match_dict = None
     full = web_jpg_pattern.match(text)
     medium = web_jpg_med_pattern.match(text)
     thumb = web_jpg_thumb_pattern.match(text)
+    """
+    print('text:', text)
+    print('full:', full)
+    print('medium:', medium)
+    print('thumb:', thumb)
+    print('\n')
+    """
 
     if full:
         match = full
@@ -166,6 +175,8 @@ def match_pattern(text=None, settings=None):
         match = thumb
     if match:
         match_dict = match.groupdict()
+    #print('match:', match)
+
     return match_dict
 
 
@@ -194,9 +205,7 @@ def generate_url_records_suffixes(settings=None):
 
                 # Determine if thumbnail, original, or web size
                 result = match_pattern(text=basename, settings=settings)
-
                 if result:
-                    #print(result)
                     catalog_number = result['catNum']
                     suffix = result.get('suffix', None)
                     size = result.get('size', 'large')
