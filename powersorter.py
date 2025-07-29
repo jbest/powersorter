@@ -10,8 +10,6 @@ import argparse
 import datetime
 import sys
 
-#print('STARTING')
-
 CONFIG_FORMAT_REQUIRED = '3.0'
 sorted_file_count = 0
 unmoved_file_count = 0
