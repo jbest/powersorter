@@ -3,6 +3,7 @@ import argparse
 import datetime
 import sys
 import os
+from pathlib import Path
 
 import powersorter as ps
 import image_resizer as derivs
@@ -72,8 +73,8 @@ if __name__ == '__main__':
 
     #show settings for testing
     attrs = vars(settings)
-    print('Settings:')
-    print('\n'.join("%s: %s" % item for item in attrs.items()))
+    #print('Settings:')
+    #print('\n'.join("%s: %s" % item for item in attrs.items()))
 
     # generate derivs
     #TODO add arg to generate derivs
@@ -86,36 +87,56 @@ if __name__ == '__main__':
     #TODO make image_resizer silent/not verbose
     #TODO make image_resizer process files that match regex, not whole directory
     #TODO instead of using regex, just use the process_folder and exclude files ending in _med and _thumb
-    
+
     for file_type, value in settings.file_types.items():
         #print('file_type', file_type, 'value', value)
-        #regex = value.get('regex', None)
-        file_regex = value.get('file_regex', None)
-        # Adding regex i flag here to make case-insensitive rather than in config files
-        regex = '(?i)' + settings.catalog_number_regex + file_regex
-        output_sub_path = value.get('output_sub_path', None)
-        output_path = settings.output_base_path.joinpath(output_sub_path)
-        # Check ability to write to directory
-        if not os.access(output_path, os.W_OK | os.X_OK):
-            #TODO log fail
-            print(f'Unable to write to directory: {output_path}')
-        else:
-            # TEMP
-            #print(f'Will scan files, input_path:{settings.input_path}, pattern:{regex}, file_type:{file_type}')
-            file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
-            """
-            sort_result = sort_files(files=file_matches, \
-                number_pad=number_pad, \
-                folder_increment=folder_increment, \
-                collection_prefix=collection_prefix, \
-                output_path=output_path)
-            sorted_file_count += sort_result.get('sorted_file_count', 0)
-            unmoved_file_count += sort_result.get('unmoved_file_count', 0)
-            """
-            #print(file_matches)
-            for match in file_matches:
-                #if match.file_path:
-                print(match['file_path'])
+        # only process web_jpg for derivative generation (skip med and thumb that already exist)
+        if file_type=='web_jpg':
+            #print('file_type', file_type, 'value', value)
+            #regex = value.get('regex', None)
+            file_regex = value.get('file_regex', None)
+            # Adding regex i flag here to make case-insensitive rather than in config files
+            regex = '(?i)' + settings.catalog_number_regex + file_regex
+            output_sub_path = value.get('output_sub_path', None)
+            output_path = settings.output_base_path.joinpath(output_sub_path)
+            # Check ability to write to directory
+            if not os.access(output_path, os.W_OK | os.X_OK):
+                #TODO log fail
+                print(f'Unable to write to directory: {output_path}')
+            else:
+                # TEMP
+                #print(f'Will scan files, input_path:{settings.input_path}, pattern:{regex}, file_type:{file_type}')
+                file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
+                """
+                sort_result = sort_files(files=file_matches, \
+                    number_pad=number_pad, \
+                    folder_increment=folder_increment, \
+                    collection_prefix=collection_prefix, \
+                    output_path=output_path)
+                sorted_file_count += sort_result.get('sorted_file_count', 0)
+                unmoved_file_count += sort_result.get('unmoved_file_count', 0)
+                """
+                print('file_matches:',file_matches)
+
+                for match in file_matches:
+                    #if match.file_path:
+                    jpg_file = Path(match['file_path'])
+                    print(match['file_path'])
+                    base_name = jpg_file.stem
+        
+                    # Create output paths in the same directory
+                    medium_path = jpg_file.parent / f"{base_name}_med.jpg"
+                    thumbnail_path = jpg_file.parent / f"{base_name}_thumb.jpg"
+                    
+                    # Create medium version
+                    print(medium_path)
+                    #resize_image(jpg_file, medium_path, MEDIUM_SIZE)
+                    
+                    # Create thumbnail version
+                    print(thumbnail_path)
+                    #resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
+
+
 
     #file_matches = ps.scan_files(path=settings.input_path, pattern=settings.regex, file_type=settings.file_types)
     #derivs.process_folder(settings.input_path)
