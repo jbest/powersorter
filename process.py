@@ -4,11 +4,17 @@ import datetime
 import sys
 import os
 from pathlib import Path
+from PIL import Image
 
 import powersorter as ps
 import image_resizer as derivs
 
 CONFIG_FORMAT_REQUIRED = '3.0'
+
+# Image Configuration
+MEDIUM_SIZE = (800, 600)  # Medium image dimensions
+THUMBNAIL_SIZE = (150, 150)  # Thumbnail dimensions
+QUALITY = 85  # JPEG quality (1-100)
 
 def arg_setup():
     # set up argument parser
@@ -65,7 +71,35 @@ def initialize_settings():
         sys.exit()
     return(settings)
 
-
+def resize_image(input_path, output_path, size, maintain_aspect=True):
+    """
+    Resize an image to the specified size.
+    
+    Args:
+        input_path: Path to the input image
+        output_path: Path where resized image will be saved
+        size: Tuple of (width, height) for the new size
+        maintain_aspect: Whether to maintain aspect ratio
+    """
+    try:
+        with Image.open(input_path) as img:
+            if maintain_aspect:
+                # Use thumbnail method to maintain aspect ratio
+                img.thumbnail(size, Image.Resampling.LANCZOS)
+            else:
+                # Resize to exact dimensions (may distort image)
+                img = img.resize(size, Image.Resampling.LANCZOS)
+            
+            # Convert to RGB if necessary (handles RGBA, P mode images)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Save the resized image
+            img.save(output_path, 'JPEG', quality=QUALITY, optimize=True)
+            print(f"✓ Created: {output_path}")
+            
+    except Exception as e:
+        print(f"✗ Error processing {input_path}: {str(e)}")
 
 if __name__ == '__main__':
     # initialize settings from args and config file
@@ -121,7 +155,7 @@ if __name__ == '__main__':
                 for match in file_matches:
                     #if match.file_path:
                     jpg_file = Path(match['file_path'])
-                    print(match['file_path'])
+                    #print(match['file_path'])
                     base_name = jpg_file.stem
         
                     # Create output paths in the same directory
@@ -130,11 +164,11 @@ if __name__ == '__main__':
                     
                     # Create medium version
                     print(medium_path)
-                    #resize_image(jpg_file, medium_path, MEDIUM_SIZE)
+                    resize_image(jpg_file, medium_path, MEDIUM_SIZE)
                     
                     # Create thumbnail version
                     print(thumbnail_path)
-                    #resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
+                    resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
 
 
 
