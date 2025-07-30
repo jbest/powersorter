@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 
 import powersorter as ps
-import image_resizer as derivs
+#import image_resizer as derivs
 
 CONFIG_FORMAT_REQUIRED = '3.0'
 
@@ -96,7 +96,7 @@ def resize_image(input_path, output_path, size, maintain_aspect=True):
             
             # Save the resized image
             img.save(output_path, 'JPEG', quality=QUALITY, optimize=True)
-            print(f"✓ Created: {output_path}")
+            #print(f"✓ Created: {output_path}")
             
     except Exception as e:
         print(f"✗ Error processing {input_path}: {str(e)}")
@@ -106,28 +106,16 @@ if __name__ == '__main__':
     settings = initialize_settings()
 
     #show settings for testing
-    attrs = vars(settings)
+    #attrs = vars(settings)
     #print('Settings:')
     #print('\n'.join("%s: %s" % item for item in attrs.items()))
 
     # generate derivs
-    #TODO add arg to generate derivs
-    # use input path
-    #print('Will generate derivs for files at:')
-    #print(settings.input_path)
-    # process input_path
-    #TODO provide extensions to process (currently hard coded in image_resizer.py)
-    #TODO pass values for rezie based on cofig params
-    #TODO make image_resizer silent/not verbose
-    #TODO make image_resizer process files that match regex, not whole directory
-    #TODO instead of using regex, just use the process_folder and exclude files ending in _med and _thumb
-
+    #TODO pass values for resize based on config params
+    #TODO make gen derivs optional
     for file_type, value in settings.file_types.items():
-        #print('file_type', file_type, 'value', value)
         # only process web_jpg for derivative generation (skip med and thumb that already exist)
         if file_type=='web_jpg':
-            #print('file_type', file_type, 'value', value)
-            #regex = value.get('regex', None)
             file_regex = value.get('file_regex', None)
             # Adding regex i flag here to make case-insensitive rather than in config files
             regex = '(?i)' + settings.catalog_number_regex + file_regex
@@ -138,19 +126,8 @@ if __name__ == '__main__':
                 #TODO log fail
                 print(f'Unable to write to directory: {output_path}')
             else:
-                # TEMP
-                #print(f'Will scan files, input_path:{settings.input_path}, pattern:{regex}, file_type:{file_type}')
                 file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
-                """
-                sort_result = sort_files(files=file_matches, \
-                    number_pad=number_pad, \
-                    folder_increment=folder_increment, \
-                    collection_prefix=collection_prefix, \
-                    output_path=output_path)
-                sorted_file_count += sort_result.get('sorted_file_count', 0)
-                unmoved_file_count += sort_result.get('unmoved_file_count', 0)
-                """
-                print('file_matches:',file_matches)
+                #print('file_matches:',file_matches)
 
                 for match in file_matches:
                     #if match.file_path:
@@ -170,11 +147,6 @@ if __name__ == '__main__':
                     print(thumbnail_path)
                     resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
 
-
-
-    #file_matches = ps.scan_files(path=settings.input_path, pattern=settings.regex, file_type=settings.file_types)
-    #derivs.process_folder(settings.input_path)
-    #print(file_matches)
 
     # sort
 
