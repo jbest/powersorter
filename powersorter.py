@@ -9,10 +9,54 @@ import pwd
 import argparse
 import datetime
 import sys
+import threading
 
 CONFIG_FORMAT_REQUIRED = '3.0'
 sorted_file_count = 0
 unmoved_file_count = 0
+
+class SortLogger():
+    _instance = None
+    _lock = threading.Lock()
+    
+    def __new__(cls, filename='test_powersorter.csv'):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
+    
+    def __init__(self, filename='test_powersorter.csv'):
+        if self._initialized:
+            return
+        
+        self.filename = Path(filename)
+        #self.fieldnames = ['timestamp', 'module', 'level', 'message']
+        self.fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
+        self._file_lock = threading.Lock()
+        
+        # Create file with headers if it doesn't exist
+        if not self.filename.exists():
+            self._write_headers()
+        
+        self._initialized = True
+    
+    def _write_headers(self):
+        with open(self.filename, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
+            writer.writeheader()
+    
+    def log(self, module_name, level, message):
+        with self._file_lock:
+            with open(self.filename, 'a', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
+                writer.writerow({
+                    'timestamp': datetime.now().isoformat(),
+                    'module': module_name,
+                    'level': level,
+                    'message': message
+                })
 
 def scan_files(path=None, pattern=None, file_type=None):
     """
@@ -272,6 +316,7 @@ if __name__ == '__main__':
         print('ERROR - Unable to retrive username.')
         username = None
 
+    #original method
     csvfile = open(log_file_path, 'w', newline='')
     fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
