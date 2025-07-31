@@ -12,8 +12,8 @@ import sys
 import threading
 
 CONFIG_FORMAT_REQUIRED = '3.0'
-sorted_file_count = 0
-unmoved_file_count = 0
+#sorted_file_count = 0
+#unmoved_file_count = 0
 
 class SortLogger():
     _instance = None
@@ -201,8 +201,11 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
     collection_prefix=None, file_types=None, destination_base_path=None, sort_logger=None, force_overwrite=None, dry_run=None, username=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
-    global sorted_file_count
-    global unmoved_file_count # files matching pattern, but not moved/sorted
+    #global sorted_file_count
+    #global unmoved_file_count # files matching pattern, but not moved/sorted
+    sorted_file_count = 0
+    unmoved_file_count = 0 # files matching pattern, but not moved/sorted
+    sort_result = None
 
     for file_type, value in file_types.items():
         #print('file_type', file_type, 'value', value)
@@ -230,6 +233,10 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
                 username=username)
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
+    return {
+        'sorted_file_count': sorted_file_count, \
+        'unmoved_file_count': unmoved_file_count, \
+        }
 
 class Settings():
     def __init__(self, prefix=None, dry_run=None, verbose=None, force_overwrite=None):
@@ -328,7 +335,7 @@ if __name__ == '__main__':
     sort_logger=SortLogger(filename=log_file_path)
 
     # start sorting
-    sort(input_path=input_path, \
+    sort_result = sort(input_path=input_path, \
         number_pad=settings.number_pad, \
         folder_increment=settings.folder_increment, \
         catalog_number_regex=settings.catalog_number_regex,\
@@ -341,6 +348,7 @@ if __name__ == '__main__':
         dry_run=settings.dry_run)
     # Summary report
     print('SORT COMPLETE')
+    print('sort_result:', sort_result)
     if verbose:
         print('sorted_file_count', sorted_file_count)
         print('unmoved_file_count', unmoved_file_count)

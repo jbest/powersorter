@@ -152,15 +152,20 @@ if __name__ == '__main__':
                     resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
 
 
+    
+    #staging
+    #TODO in powersorter.py - convert permissions/dir existance checks etc in main to functions that can be called here
+    
     # sort
-    #TODO in powersorter.py - convert permissions/dire existance checks etc in main to functions that can be called here
-    input_path_stem = Path(settings.input_path).stem
     now = datetime.datetime.now()
-    log_filename = '_'.join([settings.collection_prefix, input_path_stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
+    log_filename = '_'.join([settings.collection_prefix, Path(settings.input_path).stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
     if settings.dry_run:
         log_filename = log_filename + '_DRY-RUN'
     log_filename = log_filename + '.csv'
     log_file_path = settings.log_directory_path.joinpath(log_filename)
+
+    # intiate sort logger
+    sort_logger=ps.SortLogger(filename=log_file_path)
 
     # get current username
     try:
@@ -169,10 +174,8 @@ if __name__ == '__main__':
         print('ERROR - Unable to retrive username.')
         username = 'unknown'
 
-    sort_logger=ps.SortLogger(filename=log_file_path)
-
     # start sorting
-    ps.sort(input_path=settings.input_path, \
+    sort_results = ps.sort(input_path=settings.input_path, \
         number_pad=settings.number_pad, \
         folder_increment=settings.folder_increment, \
         catalog_number_regex=settings.catalog_number_regex,\
@@ -184,3 +187,4 @@ if __name__ == '__main__':
         dry_run=settings.dry_run)
 
     # generate urls
+    print('sort_results:', sort_results)
