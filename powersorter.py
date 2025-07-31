@@ -52,7 +52,7 @@ class SortLogger():
             with open(self.filename, 'a', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
                 writer.writerow({
-                    'timestamp': datetime.now().isoformat(),
+                    'timestamp': datetime.datetime.now().isoformat(),
                     'username': username,
                     'action': action,
                     'result': result,
@@ -140,6 +140,12 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             now = datetime.datetime.now()
             writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
                 'filetype': filetype, 'source': source, 'destination': destination})
+            if sort_logger:
+                #sort
+                print('Using sort logger')
+                sort_logger.log(username=username, action='move', result='success', details='', filetype=filetype, source=source, destination=destination)
+            else:
+                print('Sort logger not available.')
     else:
         # Create directory path if it doesn't exist
         destination_directory.mkdir(parents=True, exist_ok=True)
@@ -154,6 +160,12 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             now = datetime.datetime.now()
             writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
                 'filetype': filetype, 'source': source, 'destination': destination})
+            if sort_logger:
+                #sort
+                print('Using sort logger')
+                sort_logger.log(username=username, action='move', result='success', details=details, filetype=filetype, source=source, destination=destination)
+            else:
+                print('Sort logger not available.')
         else:
             try:
                 if destination.exists():
