@@ -5,6 +5,7 @@ import sys
 import os
 from pathlib import Path
 from PIL import Image
+import pwd
 
 import powersorter as ps
 #import image_resizer as derivs
@@ -99,20 +100,23 @@ def resize_image(input_path, output_path, size, maintain_aspect=True):
             #print(f"✓ Created: {output_path}")
             
     except Exception as e:
-        print(f"✗ Error processing {input_path}: {str(e)}")
+        print(f"Error processing {input_path}: {str(e)}")
 
 if __name__ == '__main__':
     # initialize settings from args and config file
     settings = initialize_settings()
 
     #show settings for testing
-    #attrs = vars(settings)
-    #print('Settings:')
-    #print('\n'.join("%s: %s" % item for item in attrs.items()))
+    """
+    attrs = vars(settings)
+    print('Settings:')
+    print('\n'.join("%s: %s" % item for item in attrs.items()))
+    """
 
     # generate derivs
     #TODO pass values for resize based on config params
     #TODO make gen derivs optional
+    print('Generating derivative JPG files...')
     for file_type, value in settings.file_types.items():
         # only process web_jpg for derivative generation (skip med and thumb that already exist)
         if file_type=='web_jpg':
@@ -149,5 +153,34 @@ if __name__ == '__main__':
 
 
     # sort
+    #TODO in powersorter.py - convert permissions/dire existance checks etc in main to functions that can be called here
+    input_path_stem = Path(settings.input_path).stem
+    now = datetime.datetime.now()
+    log_filename = '_'.join([settings.collection_prefix, input_path_stem, str(now.strftime('%Y-%m-%dT%H%M%S'))])
+    if settings.dry_run:
+        log_filename = log_filename + '_DRY-RUN'
+    log_filename = log_filename + '.csv'
+    log_file_path = settings.log_directory_path.joinpath(log_filename)
+
+    # get current username
+    try:
+        username = pwd.getpwuid(os.getuid()).pw_name
+    except:
+        print('ERROR - Unable to retrive username.')
+        username = 'unknown'
+
+    sort_logger=ps.SortLogger(filename=log_file_path)
+
+    # start sorting
+    ps.sort(input_path=settings.input_path, \
+        number_pad=settings.number_pad, \
+        folder_increment=settings.folder_increment, \
+        catalog_number_regex=settings.catalog_number_regex,\
+        collection_prefix=settings.collection_prefix, \
+        file_types=settings.file_types, \
+        destination_base_path=settings.output_base_path,
+        sort_logger=sort_logger,
+        username=username,
+        dry_run=settings.dry_run)
 
     # generate urls

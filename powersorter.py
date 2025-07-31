@@ -83,7 +83,7 @@ def scan_files(path=None, pattern=None, file_type=None):
                 matches.append(file_dict)
     return matches
 
-def sort_files(files=None, folder_increment=None, number_pad=None, collection_prefix=None, output_path=None, sort_logger=None):
+def sort_files(files=None, folder_increment=None, number_pad=None, collection_prefix=None, output_path=None, sort_logger=None, force_overwrite=None, dry_run=None, username=None, verbose=None):
     """
     Sort and move files into correct directory based on
     file pattern and directory name increments
@@ -106,8 +106,11 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
             destination_directory=destination_path, \
             filename=basename, \
             filetype=file_type, \
-            force_overwrite=settings.force_overwrite,
-            sort_logger=sort_logger
+            force_overwrite=force_overwrite,
+            sort_logger=sort_logger,
+            dry_run=dry_run,
+            username=username,
+            verbose=verbose
             )
         if move_result['move_success']:
             sorted_file_count +=1
@@ -118,14 +121,15 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         'unmoved_file_count': unmoved_file_count, \
         }
 
-def move_file(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False, sort_logger=None):
+def move_file(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False, sort_logger=None, dry_run=None, username=None, verbose=None):
     """
     Move files from the source to the destination directory.
     Creates destination directory if it does not exist.
     Will overwrite existing files if force_overwrite_confirmed = True.
     """
     destination = destination_directory.joinpath(filename)
-    if settings.dry_run:
+    #if settings.dry_run:
+    if dry_run:
         if destination.exists():
             now = datetime.datetime.now()
             move_success = False
@@ -194,7 +198,7 @@ def arg_setup():
     return args
 
 def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
-    collection_prefix=None, file_types=None, destination_base_path=None, sort_logger=None):
+    collection_prefix=None, file_types=None, destination_base_path=None, sort_logger=None, force_overwrite=None, dry_run=None, username=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
     global sorted_file_count
@@ -220,7 +224,10 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
                 folder_increment=folder_increment, \
                 collection_prefix=collection_prefix, \
                 output_path=output_path,
-                sort_logger=sort_logger)
+                sort_logger=sort_logger,
+                force_overwrite=force_overwrite,
+                dry_run=dry_run,
+                username=username)
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
 
@@ -328,11 +335,13 @@ if __name__ == '__main__':
         collection_prefix=settings.collection_prefix, \
         file_types=settings.file_types, \
         destination_base_path=settings.output_base_path,
-        sort_logger=sort_logger)
+        sort_logger=sort_logger,
+        force_overwrite=settings.force_overwrite,
+        username=username,
+        dry_run=settings.dry_run)
     # Summary report
     print('SORT COMPLETE')
     if verbose:
         print('sorted_file_count', sorted_file_count)
         print('unmoved_file_count', unmoved_file_count)
-    #print('Log file written to (OLD method):', log_file_path)
     print('Log file written to:', sort_logger.filename)
