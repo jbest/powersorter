@@ -130,22 +130,14 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             now = datetime.datetime.now()
             move_success = False
             status = 'DRY-RUN - simulated move'
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
-                'filetype': filetype, 'source': source, 'destination': destination})
+            sort_logger.log(username=username, action='DRY_RUN-move', result='fail', details='', filetype=filetype, source=source, destination=destination)
 
         else:
             print('DRY-RUN: Moved:', destination)
             status = 'DRY-RUN - simulated move'
             move_success = True
-            now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'success', \
-                'filetype': filetype, 'source': source, 'destination': destination})
-            if sort_logger:
-                #sort
-                print('Using sort logger')
-                sort_logger.log(username=username, action='move', result='success', details='', filetype=filetype, source=source, destination=destination)
-            else:
-                print('Sort logger not available.')
+            sort_logger.log(username=username, action='DRY_RUN-move', result='success', details='', filetype=filetype, source=source, destination=destination)
+
     else:
         # Create directory path if it doesn't exist
         destination_directory.mkdir(parents=True, exist_ok=True)
@@ -157,15 +149,8 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             move_success = False
             status = 'fail'
             details = 'filename exists'
-            now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, 'action': 'move', 'result': status, 'details': details,\
-                'filetype': filetype, 'source': source, 'destination': destination})
-            if sort_logger:
-                #sort
-                print('Using sort logger')
-                sort_logger.log(username=username, action='move', result='success', details=details, filetype=filetype, source=source, destination=destination)
-            else:
-                print('Sort logger not available.')
+            sort_logger.log(username=username, action='move', result='success', details=details, filetype=filetype, source=source, destination=destination)
+
         else:
             try:
                 if destination.exists():
@@ -185,10 +170,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
                 status = 'fail'
                 details = str(e)
                 move_success = False
-            now = datetime.datetime.now()
-            writer.writerow({'timestamp': now, 'username': username, \
-                'action': 'move', 'result': status, 'details': details, \
-                'filetype': filetype, 'source': source, 'destination': destination})
+            sort_logger.log(username=username, action='move', result=status, details=details, filetype=filetype, source=source, destination=destination)
             if verbose:
                 print('Move:', destination, status)    
     return {'move_success': move_success, 'status': status}
@@ -217,13 +199,6 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
     # scan, sort, and move each file type
     global sorted_file_count
     global unmoved_file_count # files matching pattern, but not moved/sorted
-    
-    #testing new sort logger
-    if sort_logger:
-        print('TEST-sort_logger', sort_logger)
-    else:
-        print('FAIL no sort logger')
-        return
 
     for file_type, value in file_types.items():
         #print('file_type', file_type, 'value', value)
@@ -235,8 +210,9 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
         output_path = destination_base_path.joinpath(output_sub_path)
         # Check ability to write to directory
         if not os.access(output_path, os.W_OK | os.X_OK):
-            #TODO log fail
-            print(f'Unable to write to directory: {output_path}')
+            details = f'Unable to write to directory: {output_path}'
+            sort_logger.log(username=username, action='move', result='fail', details=details, filetype=file_type, source=input_path, destination=output_path)
+            print(details)
         else:
             file_matches = scan_files(path=input_path, pattern=regex, file_type=file_type)
             sort_result = sort_files(files=file_matches, \
@@ -279,7 +255,6 @@ if __name__ == '__main__':
     # initialize settings
     # set up argparse
     args = arg_setup()
-        #print(args)
     config_file = args['config']
     dry_run = args['dry_run']
     verbose = args['verbose']
@@ -341,22 +316,10 @@ if __name__ == '__main__':
         username = pwd.getpwuid(os.getuid()).pw_name
     except:
         print('ERROR - Unable to retrive username.')
-        username = None
+        username = 'unknown'
 
-    #original method
-    csvfile = open(log_file_path, 'w', newline='')
-    fieldnames = ['timestamp', 'username', 'action', 'result', 'details', 'filetype', 'source', 'destination']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
+    sort_logger=SortLogger(filename=log_file_path)
 
-    #Testing new CSV logger class
-    test_log_filename = log_filename + '_TEST.csv'
-    test_log_file_path = settings.log_directory_path.joinpath(test_log_filename)
-    sort_logger=SortLogger(filename=test_log_file_path)
-    print(sort_logger)
-
-    #input_path = Path(settings.files.get('input_path', None))
-    #print(settings.catalog_number_regex)
     # start sorting
     sort(input_path=input_path, \
         number_pad=settings.number_pad, \
@@ -366,10 +329,10 @@ if __name__ == '__main__':
         file_types=settings.file_types, \
         destination_base_path=settings.output_base_path,
         sort_logger=sort_logger)
-    csvfile.close()
     # Summary report
     print('SORT COMPLETE')
     if verbose:
         print('sorted_file_count', sorted_file_count)
         print('unmoved_file_count', unmoved_file_count)
-    print('Log file written to:', log_file_path)
+    #print('Log file written to (OLD method):', log_file_path)
+    print('Log file written to:', sort_logger.filename)
