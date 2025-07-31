@@ -8,6 +8,7 @@ from PIL import Image
 import pwd
 
 import powersorter as ps
+import url_gen
 #import image_resizer as derivs
 
 CONFIG_FORMAT_REQUIRED = '3.0'
@@ -191,3 +192,7 @@ if __name__ == '__main__':
 
     # generate urls
     print('Will generate URLs from log file:', sort_logger.filename)
+    # Get input file name
+    input_file_name_stem = Path(sort_logger.filename).stem
+    output_file_name = input_file_name_stem + '_urls.csv'
+    url_gen.write_url_file(input_file=sort_logger.filename, output_file_name=output_file_name, settings=settings)
