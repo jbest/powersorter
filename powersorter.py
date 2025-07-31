@@ -264,6 +264,13 @@ class Settings():
                 self.output_base_path = Path(self.files.get('output_base_path', None))
                 # Get the type of files and patterns that will be scanned and sorted
                 self.file_types = config.get('file_types', None)
+                # Config params needed for url_gen
+                self.web_base = self.collection.get('web_base', None) # path of directory available via HTTP/S
+                self.url_base = self.collection.get('url_base', None) # URL of directory served via HTTP/S
+                self.file_types = config.get('file_types', None)
+                self.web_jpg_regex = self.file_types.get('web_jpg', None).get('file_regex', None)
+                self.web_jpg_med_regex = self.file_types.get('web_jpg_med', None).get('file_regex', None)
+                self.web_jpg_thumb_regex = self.file_types.get('web_jpg_thumb', None).get('file_regex', None)
     
 if __name__ == '__main__':
     # initialize settings

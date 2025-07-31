@@ -186,5 +186,8 @@ if __name__ == '__main__':
         username=username,
         dry_run=settings.dry_run)
 
-    # generate urls
     print('sort_results:', sort_results)
+
+
+    # generate urls
+    print('Will generate URLs from log file:', sort_logger.filename)
