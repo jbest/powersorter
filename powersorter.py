@@ -47,15 +47,19 @@ class SortLogger():
             writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
             writer.writeheader()
     
-    def log(self, module_name, level, message):
+    def log(self, username=None, action=None, result=None, details=None, filetype=None, source=None, destination=None):
         with self._file_lock:
             with open(self.filename, 'a', newline='') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
                 writer.writerow({
                     'timestamp': datetime.now().isoformat(),
-                    'module': module_name,
-                    'level': level,
-                    'message': message
+                    'username': username,
+                    'action': action,
+                    'result': result,
+                    'details': details,
+                    'filetype': filetype,
+                    'source': source,
+                    'destination': destination
                 })
 
 def scan_files(path=None, pattern=None, file_type=None):
@@ -79,7 +83,7 @@ def scan_files(path=None, pattern=None, file_type=None):
                 matches.append(file_dict)
     return matches
 
-def sort_files(files=None, folder_increment=None, number_pad=None, collection_prefix=None, output_path=None):
+def sort_files(files=None, folder_increment=None, number_pad=None, collection_prefix=None, output_path=None, sort_logger=None):
     """
     Sort and move files into correct directory based on
     file pattern and directory name increments
@@ -102,7 +106,8 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
             destination_directory=destination_path, \
             filename=basename, \
             filetype=file_type, \
-            force_overwrite=settings.force_overwrite
+            force_overwrite=settings.force_overwrite,
+            sort_logger=sort_logger
             )
         if move_result['move_success']:
             sorted_file_count +=1
@@ -113,7 +118,7 @@ def sort_files(files=None, folder_increment=None, number_pad=None, collection_pr
         'unmoved_file_count': unmoved_file_count, \
         }
 
-def move_file(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False):
+def move_file(source=None, destination_directory=None, filename=None, filetype=None, force_overwrite=False, sort_logger=None):
     """
     Move files from the source to the destination directory.
     Creates destination directory if it does not exist.
@@ -127,6 +132,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             status = 'DRY-RUN - simulated move'
             writer.writerow({'timestamp': now, 'username': username, 'action': 'DRY_RUN-move', 'result': 'fail', \
                 'filetype': filetype, 'source': source, 'destination': destination})
+
         else:
             print('DRY-RUN: Moved:', destination)
             status = 'DRY-RUN - simulated move'
@@ -194,11 +200,19 @@ def arg_setup():
     return args
 
 def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number_regex=None,\
-    collection_prefix=None, file_types=None, destination_base_path=None):
+    collection_prefix=None, file_types=None, destination_base_path=None, sort_logger=None):
     # TODO check ALL output directories before scanning for files
     # scan, sort, and move each file type
     global sorted_file_count
     global unmoved_file_count # files matching pattern, but not moved/sorted
+    
+    #testing new sort logger
+    if sort_logger:
+        print('TEST-sort_logger', sort_logger)
+    else:
+        print('FAIL no sort logger')
+        return
+
     for file_type, value in file_types.items():
         #print('file_type', file_type, 'value', value)
         #regex = value.get('regex', None)
@@ -217,7 +231,8 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
                 number_pad=number_pad, \
                 folder_increment=folder_increment, \
                 collection_prefix=collection_prefix, \
-                output_path=output_path)
+                output_path=output_path,
+                sort_logger=sort_logger)
             sorted_file_count += sort_result.get('sorted_file_count', 0)
             unmoved_file_count += sort_result.get('unmoved_file_count', 0)
 
@@ -322,6 +337,12 @@ if __name__ == '__main__':
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
 
+    #Testing new CSV logger class
+    test_log_filename = log_filename + '_TEST.csv'
+    test_log_file_path = settings.log_directory_path.joinpath(test_log_filename)
+    sort_logger=SortLogger(filename=test_log_file_path)
+    print(sort_logger)
+
     #input_path = Path(settings.files.get('input_path', None))
     #print(settings.catalog_number_regex)
     # start sorting
@@ -331,7 +352,8 @@ if __name__ == '__main__':
         catalog_number_regex=settings.catalog_number_regex,\
         collection_prefix=settings.collection_prefix, \
         file_types=settings.file_types, \
-        destination_base_path=settings.output_base_path)
+        destination_base_path=settings.output_base_path,
+        sort_logger=sort_logger)
     csvfile.close()
     # Summary report
     print('SORT COMPLETE')
