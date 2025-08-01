@@ -25,8 +25,10 @@ def arg_setup():
         help="Path to the configuration file to be used for processing images.")
     ap.add_argument("-i", "--input_path", required=False, \
         help="Input directory path - overrides input_path in config file")
-    ap.add_argument("-d", "--derivatives", action="store_true", \
-        help="Generate derivative images files for JPGs.")
+    #ap.add_argument("-d", "--derivatives", action="store_true", \
+    #    help="Generate derivative images files for JPGs.")
+    ap.add_argument("-s", "--sort_only", action="store_true", \
+        help="Sort only, skip derivative creation.")
     ap.add_argument("-v", "--verbose", action="store_true", \
         help="Detailed output.")
     ap.add_argument("-n", "--dry_run", action="store_true", \
@@ -76,7 +78,7 @@ def initialize_settings():
         sys.exit()
     return(settings, args)
 
-def resize_image(input_path, output_path, size, maintain_aspect=True):
+def resize_image(input_path, output_path, size, maintain_aspect=True, force_overwrite=False):
     """
     Resize an image to the specified size.
     
@@ -86,6 +88,13 @@ def resize_image(input_path, output_path, size, maintain_aspect=True):
         size: Tuple of (width, height) for the new size
         maintain_aspect: Whether to maintain aspect ratio
     """
+
+    if not force_overwrite:
+        # Check if output file already exists
+        if os.path.exists(output_path): # and not force_overwrite:
+            print(f"Skipping {output_path} - file already exists (use -force parameter to overwrite)")
+            return False
+
     try:
         with Image.open(input_path) as img:
             if maintain_aspect:
@@ -113,7 +122,8 @@ if __name__ == '__main__':
     derivatives are not relevant to powersorter so args are retured
     to get the get_derivatives param
     """
-    generate_derivatives = args['derivatives']
+    #generate_derivatives = args['derivatives']
+    sort_only = args['sort_only']
 
     #show settings for testing
     """
@@ -124,9 +134,12 @@ if __name__ == '__main__':
 
     # generate derivs
     #TODO pass values for resize based on config params
-    #TODO make gen derivs optional
-    if generate_derivatives:
+    if sort_only:
+        print('Derivatives will not be generated, only sorting files (-s parameter)')
+    else:
         print('Generating derivative JPG files...')
+        med_count = 0
+        thumb_count = 0
         for file_type, value in settings.file_types.items():
             # only process web_jpg for derivative generation (skip med and thumb that already exist)
             if file_type=='web_jpg':
@@ -154,12 +167,19 @@ if __name__ == '__main__':
                         thumbnail_path = jpg_file.parent / f"{base_name}_thumb.jpg"
                         
                         # Create medium version
-                        print(medium_path)
-                        resize_image(jpg_file, medium_path, MEDIUM_SIZE)
+                        if settings.verbose:
+                            print(medium_path)
+                        med_result = resize_image(jpg_file, medium_path, MEDIUM_SIZE, force_overwrite=settings.force_overwrite)
+                        if med_result:
+                            med_count +=1
                         
                         # Create thumbnail version
-                        print(thumbnail_path)
-                        resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
+                        if settings.verbose:
+                            print(thumbnail_path)
+                        thumb_result = resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE, force_overwrite=settings.force_overwrite)
+                        if thumb_result:
+                            thumb_count += 1
+        print(f'Generated {med_count} medium derivatives, {thumb_count} thumbnail derivatives.')
 
 
     #staging
