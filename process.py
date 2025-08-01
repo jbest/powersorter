@@ -25,6 +25,8 @@ def arg_setup():
         help="Path to the configuration file to be used for processing images.")
     ap.add_argument("-i", "--input_path", required=False, \
         help="Input directory path - overrides input_path in config file")
+    ap.add_argument("-d", "--derivatives", action="store_true", \
+        help="Generate derivative images files for JPGs.")
     ap.add_argument("-v", "--verbose", action="store_true", \
         help="Detailed output.")
     ap.add_argument("-n", "--dry_run", action="store_true", \
@@ -43,6 +45,7 @@ def initialize_settings():
     verbose = args['verbose']
     force_overwrite = args['force']
     input_path_override = args['input_path']
+    #generate_derivatives = args['derivatives'] # not in settings class, not needed by powersorter
 
     # use input_path arg to override input_path in config file
     if input_path_override:
@@ -71,7 +74,7 @@ def initialize_settings():
     if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
         print('Wrong config format version:', settings.config_format, 'Required:', CONFIG_FORMAT_REQUIRED)
         sys.exit()
-    return(settings)
+    return(settings, args)
 
 def resize_image(input_path, output_path, size, maintain_aspect=True):
     """
@@ -98,14 +101,19 @@ def resize_image(input_path, output_path, size, maintain_aspect=True):
             
             # Save the resized image
             img.save(output_path, 'JPEG', quality=QUALITY, optimize=True)
-            #print(f"✓ Created: {output_path}")
             
     except Exception as e:
         print(f"Error processing {input_path}: {str(e)}")
 
 if __name__ == '__main__':
     # initialize settings from args and config file
-    settings = initialize_settings()
+    settings, args = initialize_settings()
+    """
+    Most args are incorporated into the Settings class for powersorter
+    derivatives are not relevant to powersorter so args are retured
+    to get the get_derivatives param
+    """
+    generate_derivatives = args['derivatives']
 
     #show settings for testing
     """
@@ -117,43 +125,43 @@ if __name__ == '__main__':
     # generate derivs
     #TODO pass values for resize based on config params
     #TODO make gen derivs optional
-    print('Generating derivative JPG files...')
-    for file_type, value in settings.file_types.items():
-        # only process web_jpg for derivative generation (skip med and thumb that already exist)
-        if file_type=='web_jpg':
-            file_regex = value.get('file_regex', None)
-            # Adding regex i flag here to make case-insensitive rather than in config files
-            regex = '(?i)' + settings.catalog_number_regex + file_regex
-            output_sub_path = value.get('output_sub_path', None)
-            output_path = settings.output_base_path.joinpath(output_sub_path)
-            # Check ability to write to directory
-            if not os.access(output_path, os.W_OK | os.X_OK):
-                #TODO log fail
-                print(f'Unable to write to directory: {output_path}')
-            else:
-                file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
-                #print('file_matches:',file_matches)
+    if generate_derivatives:
+        print('Generating derivative JPG files...')
+        for file_type, value in settings.file_types.items():
+            # only process web_jpg for derivative generation (skip med and thumb that already exist)
+            if file_type=='web_jpg':
+                file_regex = value.get('file_regex', None)
+                # Adding regex i flag here to make case-insensitive rather than in config files
+                regex = '(?i)' + settings.catalog_number_regex + file_regex
+                output_sub_path = value.get('output_sub_path', None)
+                output_path = settings.output_base_path.joinpath(output_sub_path)
+                # Check ability to write to directory
+                if not os.access(output_path, os.W_OK | os.X_OK):
+                    #TODO log fail
+                    print(f'Unable to write to directory: {output_path}')
+                else:
+                    file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
+                    #print('file_matches:',file_matches)
 
-                for match in file_matches:
-                    #if match.file_path:
-                    jpg_file = Path(match['file_path'])
-                    #print(match['file_path'])
-                    base_name = jpg_file.stem
-        
-                    # Create output paths in the same directory
-                    medium_path = jpg_file.parent / f"{base_name}_med.jpg"
-                    thumbnail_path = jpg_file.parent / f"{base_name}_thumb.jpg"
-                    
-                    # Create medium version
-                    print(medium_path)
-                    resize_image(jpg_file, medium_path, MEDIUM_SIZE)
-                    
-                    # Create thumbnail version
-                    print(thumbnail_path)
-                    resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
+                    for match in file_matches:
+                        #if match.file_path:
+                        jpg_file = Path(match['file_path'])
+                        #print(match['file_path'])
+                        base_name = jpg_file.stem
+            
+                        # Create output paths in the same directory
+                        medium_path = jpg_file.parent / f"{base_name}_med.jpg"
+                        thumbnail_path = jpg_file.parent / f"{base_name}_thumb.jpg"
+                        
+                        # Create medium version
+                        print(medium_path)
+                        resize_image(jpg_file, medium_path, MEDIUM_SIZE)
+                        
+                        # Create thumbnail version
+                        print(thumbnail_path)
+                        resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE)
 
 
-    
     #staging
     #TODO in powersorter.py - convert permissions/dir existance checks etc in main to functions that can be called here
     
@@ -189,10 +197,10 @@ if __name__ == '__main__':
 
     print('sort_results:', sort_results)
 
-
     # generate urls
-    print('Will generate URLs from log file:', sort_logger.filename)
-    # Get input file name
+    print('Generating media URLs from log file:', sort_logger.filename)
+    # Create output file name
     input_file_name_stem = Path(sort_logger.filename).stem
     output_file_name = input_file_name_stem + '_urls.csv'
     url_gen.write_url_file(input_file=sort_logger.filename, output_file_name=output_file_name, settings=settings)
+    print('URLS written to:', output_file_name)
