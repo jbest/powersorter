@@ -6,9 +6,7 @@
         "name": "BRIT",
         "prefix": "BRIT",
         "catalog_number_regex": "(?P<catNum>(?P<instID>BRIT)(-(?P<collID>XX)-)*(?P<numerical>\\d+))",
-        "web_base_OLD": "/media/jbest/data3/BRIT_git/powersorter/staging/web/",
-        "web_base_OLD2": "/media/jbest/data3/BRIT_git/powersorter/web/",
-        "web_base": "/media/jbest/data3/BRIT_git/powersorter/",
+        "web_base": "/media/jbest/data3/BRIT_git/powersorter/web",
         "url_base": "https://web.corral.tacc.utexas.edu/torch/"
     },
     "files": {

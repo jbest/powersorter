@@ -25,8 +25,6 @@ def arg_setup():
         help="Path to the configuration file to be used for processing images.")
     ap.add_argument("-i", "--input_path", required=False, \
         help="Input directory path - overrides input_path in config file")
-    #ap.add_argument("-d", "--derivatives", action="store_true", \
-    #    help="Generate derivative images files for JPGs.")
     ap.add_argument("-s", "--sort_only", action="store_true", \
         help="Sort only, skip derivative creation.")
     ap.add_argument("-v", "--verbose", action="store_true", \
@@ -68,6 +66,7 @@ def initialize_settings():
             force_overwrite_confirmed = False
             sys.exit()
 
+    #TODO implement input_path override
     settings = ps.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
     #Load settings from config
     settings.load_config(config_file=config_file)
@@ -120,7 +119,7 @@ if __name__ == '__main__':
     """
     Most args are incorporated into the Settings class for powersorter
     derivatives are not relevant to powersorter so args are retured
-    to get the get_derivatives param
+    to get the sort_only param
     """
     #generate_derivatives = args['derivatives']
     sort_only = args['sort_only']
