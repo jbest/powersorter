@@ -91,7 +91,10 @@ def resize_image(input_path, output_path, size, maintain_aspect=True, force_over
     if not force_overwrite:
         # Check if output file already exists
         if os.path.exists(output_path): # and not force_overwrite:
-            print(f"Skipping {output_path} - file already exists (use -force parameter to overwrite)")
+            
+            #print(f'\rProcessing item {i+1}/10', end='', flush=True)
+            print(f"\rSkipping {output_path} - file already exists (use -force parameter to overwrite)", end='', flush=True)
+
             return False
 
     try:
@@ -178,6 +181,9 @@ if __name__ == '__main__':
                         thumb_result = resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE, force_overwrite=settings.force_overwrite)
                         if thumb_result:
                             thumb_count += 1
+        
+        #TODO print the count of files skipped/existing
+        print() #newline after verbose results
         print(f'Generated {med_count} medium derivatives, {thumb_count} thumbnail derivatives.')
 
 

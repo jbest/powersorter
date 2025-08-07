@@ -137,6 +137,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             sort_logger.log(username=username, action='DRY_RUN-move', result='fail', details='', filetype=filetype, source=source, destination=destination)
 
         else:
+            #TODO make dry run less verbose
             print('DRY-RUN: Moved:', destination)
             status = 'DRY-RUN - simulated move'
             move_success = True
