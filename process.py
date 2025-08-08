@@ -79,7 +79,7 @@ def initialize_settings():
 
 def resize_image(input_path, output_path, size, maintain_aspect=True, force_overwrite=False):
     """
-    Resize an image to the specified size.
+    Resize an image to the specified size and save to path.
     
     Args:
         input_path: Path to the input image
@@ -94,7 +94,6 @@ def resize_image(input_path, output_path, size, maintain_aspect=True, force_over
             
             #print(f'\rProcessing item {i+1}/10', end='', flush=True)
             print(f"\rSkipping {output_path} - file already exists (use -force parameter to overwrite)", end='', flush=True)
-
             return False
 
     try:
@@ -112,9 +111,11 @@ def resize_image(input_path, output_path, size, maintain_aspect=True, force_over
             
             # Save the resized image
             img.save(output_path, 'JPEG', quality=QUALITY, optimize=True)
+            return True
             
     except Exception as e:
         print(f"Error processing {input_path}: {str(e)}")
+        return False
 
 if __name__ == '__main__':
     # initialize settings from args and config file
@@ -145,9 +146,13 @@ if __name__ == '__main__':
         for file_type, value in settings.file_types.items():
             # only process web_jpg for derivative generation (skip med and thumb that already exist)
             if file_type=='web_jpg':
+                # get the file regex for this particular file type
                 file_regex = value.get('file_regex', None)
                 # Adding regex i flag here to make case-insensitive rather than in config files
                 regex = '(?i)' + settings.catalog_number_regex + file_regex
+                #testing
+                #print('file regex:', file_regex)
+                #print('full regex:', regex)
                 output_sub_path = value.get('output_sub_path', None)
                 output_path = settings.output_base_path.joinpath(output_sub_path)
                 # Check ability to write to directory
@@ -156,12 +161,14 @@ if __name__ == '__main__':
                     print(f'Unable to write to directory: {output_path}')
                 else:
                     file_matches = ps.scan_files(path=settings.input_path, pattern=regex, file_type=file_type)
+                    #testing
                     #print('file_matches:',file_matches)
 
                     for match in file_matches:
                         #if match.file_path:
                         jpg_file = Path(match['file_path'])
-                        #print(match['file_path'])
+                        # testing
+                        #print('Matched pattern:', match['file_path'])
                         base_name = jpg_file.stem
             
                         # Create output paths in the same directory
@@ -228,4 +235,5 @@ if __name__ == '__main__':
     input_file_name_stem = Path(sort_logger.filename).stem
     output_file_name = input_file_name_stem + '_urls.csv'
     url_gen.write_url_file(input_file=sort_logger.filename, output_file_name=output_file_name, settings=settings)
+    #TODO write copy of URLs to web-accessible path
     print('URLS written to:', output_file_name)
