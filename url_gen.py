@@ -134,24 +134,23 @@ def generate_url_records(file_base_path=None, url_base=None):
     return occurrence_set
 
 def match_pattern(text=None, settings=None):
-    web_jpg_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_regex)
-    web_jpg_med_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_med_regex)
-    web_jpg_thumb_pattern = re.compile(settings.catalog_number_regex + settings.web_jpg_thumb_regex)
-
-    #print(web_jpg_pattern)
+    # Adding regex i flag here to make case-insensitive rather than in config files
+    web_jpg_pattern = re.compile('(?i)' + settings.catalog_number_regex + settings.web_jpg_regex)
+    web_jpg_med_pattern = re.compile('(?i)' + settings.catalog_number_regex + settings.web_jpg_med_regex)
+    web_jpg_thumb_pattern = re.compile('(?i)' + settings.catalog_number_regex + settings.web_jpg_thumb_regex)
 
     # test image patterns
-
     match = None
     match_dict = None
     full = web_jpg_pattern.match(text)
     medium = web_jpg_med_pattern.match(text)
     thumb = web_jpg_thumb_pattern.match(text)
     """
+    print(web_jpg_pattern, web_jpg_med_pattern, web_jpg_thumb_pattern)
     print('text:', text)
-    print('full:', full)
-    print('medium:', medium)
-    print('thumb:', thumb)
+    print('full:', full, 'regex:', web_jpg_pattern)
+    print('medium:', medium, 'regex:', web_jpg_med_pattern)
+    print('thumb:', thumb, 'regex:', web_jpg_thumb_pattern)
     print('\n')
     """
 
@@ -193,6 +192,8 @@ def generate_url_records_suffixes(input_file=None, settings=None):
 
                 # Determine if thumbnail, original, or web size
                 result = match_pattern(text=basename, settings=settings)
+                #testing
+                #print('*** url_gen match_pattern result:', result)
                 if result:
                     catalog_number = result['catNum']
                     suffix = result.get('suffix', None)
@@ -219,6 +220,8 @@ def generate_url_records_suffixes(input_file=None, settings=None):
 
 def write_url_file(input_file=None, output_file_name=None, settings=None):
     occurrence_media_records = generate_url_records_suffixes(input_file=input_file, settings=settings)
+    #Testing
+    #print('url_gen occurrence_media_records:', occurrence_media_records)
     with open(output_file_name, 'w', newline='') as csvfile:
         fieldnames=['catalog_number', 'large', 'web', 'thumbnail']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
