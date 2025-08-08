@@ -212,7 +212,7 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
         #print('file_type', file_type, 'value', value)
         #regex = value.get('regex', None)
         file_regex = value.get('file_regex', None)
-	# Adding regex i flag here to make case-insensitive rather than in config files
+        # Adding regex i flag here to make case-insensitive rather than in config files
         regex = '(?i)' + catalog_number_regex + file_regex
         output_sub_path = value.get('output_sub_path', None)
         output_path = destination_base_path.joinpath(output_sub_path)
