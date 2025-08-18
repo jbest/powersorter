@@ -20,23 +20,23 @@
     },
     "file_types": {
         "web_jpg": {
-            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/OKLA/"
         },
         "web_jpg_med": {
-            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/OKLA/"
         },
         "web_jpg_thumb": {
-            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/OKLA/"
         },
         "archive_dng": {
-            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>dng)(?i)",
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>dng)",
             "output_sub_path": "archive/OKLA/"
         },
         "ocr": {
-            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_ocr)(\\.)(?P<ext>txt|json)(?i)",
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_ocr)(\\.)(?P<ext>txt|json)",
             "output_sub_path": "web/OKLA/"
         }
     }
