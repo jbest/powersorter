@@ -29,6 +29,8 @@ def arg_setup():
         help="Sort only, skip derivative creation.")
     ap.add_argument("-v", "--verbose", action="store_true", \
         help="Detailed output.")
+    ap.add_argument("-d", "--debug", action="store_true", \
+        help="Detailed debug output, very verbose.")
     ap.add_argument("-n", "--dry_run", action="store_true", \
         help="Simulate the sort process without moving files or creating directories.")
     ap.add_argument("-f", "--force", action="store_true", \
@@ -43,6 +45,7 @@ def initialize_settings():
     config_file = args['config']
     dry_run = args['dry_run']
     verbose = args['verbose']
+    debug = args['debug']
     force_overwrite = args['force']
     input_path_override = args['input_path']
     #generate_derivatives = args['derivatives'] # not in settings class, not needed by powersorter
@@ -67,7 +70,7 @@ def initialize_settings():
             sys.exit()
 
     #TODO implement input_path override
-    settings = ps.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed)
+    settings = ps.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed, debug=debug)
     #Load settings from config
     settings.load_config(config_file=config_file)
 
@@ -128,12 +131,12 @@ if __name__ == '__main__':
     #generate_derivatives = args['derivatives']
     sort_only = args['sort_only']
 
-    #show settings for testing
-    """
-    attrs = vars(settings)
-    print('Settings:')
-    print('\n'.join("%s: %s" % item for item in attrs.items()))
-    """
+
+    #show settings for debug
+    if settings.debug:
+        attrs = vars(settings)
+        print('Settings:')
+        print('\n'.join("%s: %s" % item for item in attrs.items()))
 
     # generate derivs
     #TODO pass values for resize based on config params
@@ -151,8 +154,10 @@ if __name__ == '__main__':
                 # Adding regex i flag here to make case-insensitive rather than in config files
                 regex = '(?i)' + settings.catalog_number_regex + file_regex
                 #testing
-                #print('file regex:', file_regex)
-                #print('full regex:', regex)
+                if settings.debug:
+                    print('DEBUG')
+                    print('file regex:', file_regex)
+                    print('full regex:', regex)
                 output_sub_path = value.get('output_sub_path', None)
                 output_path = settings.output_base_path.joinpath(output_sub_path)
                 # Check ability to write to directory

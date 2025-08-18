@@ -240,11 +240,12 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
         }
 
 class Settings():
-    def __init__(self, prefix=None, dry_run=None, verbose=None, force_overwrite=None):
+    def __init__(self, prefix=None, dry_run=None, verbose=None, force_overwrite=None, debug=False):
         self.prefix = prefix
         self.dry_run = dry_run
         self.verbose = verbose
         self.force_overwrite = force_overwrite
+        self.debug = debug
 
     def load_config(self, config_file=None):
         # load config file
