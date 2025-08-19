@@ -219,9 +219,13 @@ def generate_url_records_suffixes(input_file=None, settings=None):
     return occurrence_set
 
 def write_url_file(input_file=None, output_file_name=None, settings=None):
+    # generate media URLs
     occurrence_media_records = generate_url_records_suffixes(input_file=input_file, settings=settings)
-    #Testing
-    #print('url_gen occurrence_media_records:', occurrence_media_records)
+    if settings.debug:
+        print('DEBUG')
+        print('--- START url_gen occurrence_media_records ---')
+        print(occurrence_media_records)
+        print('---END url_gen occurrence_media_records ---')
     with open(output_file_name, 'w', newline='') as csvfile:
         fieldnames=['catalog_number', 'large', 'web', 'thumbnail']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
