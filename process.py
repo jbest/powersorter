@@ -230,7 +230,10 @@ if __name__ == '__main__':
         destination_base_path=settings.output_base_path,
         sort_logger=sort_logger,
         username=username,
-        dry_run=settings.dry_run)
+        dry_run=settings.dry_run,
+        verbose=settings.verbose,
+        debug=settings.debug,
+        force_overwrite=settings.force_overwrite)
 
     print('sort_results:', sort_results)
 
