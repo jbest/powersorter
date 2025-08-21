@@ -59,7 +59,8 @@ def initialize_settings():
     #Confirm force overwrite
     force_overwrite_confirmed = False
     if force_overwrite:
-        print('Files with identical names will be overwritten if you proceed.')
+        print('Files with identical names will be OVERWRITTEN if you proceed.')
+        print('This process will overwrite existing files in the web directory and archive directory.')
         response = input('Type \'overwrite\' and [RETURN/ENTER] to confirm desire to overwrite files: ')
         if response == 'overwrite':
             print('Will overwrite duplicate file names...')
@@ -80,7 +81,7 @@ def initialize_settings():
         sys.exit()
     return(settings, args)
 
-def resize_image(input_path, output_path, size, maintain_aspect=True, force_overwrite=False):
+def resize_image(input_path, output_path, size, maintain_aspect=True, force_overwrite=False, verbose=False):
     """
     Resize an image to the specified size and save to path.
     
@@ -95,8 +96,8 @@ def resize_image(input_path, output_path, size, maintain_aspect=True, force_over
         # Check if output file already exists
         if os.path.exists(output_path): # and not force_overwrite:
             
-            #print(f'\rProcessing item {i+1}/10', end='', flush=True)
-            print(f"\rSkipping {output_path} - file already exists (use -force parameter to overwrite)", end='', flush=True)
+            if verbose:
+                print(f"Skipping {output_path} - file already exists (use -force parameter to overwrite)")
             return False
 
     try:
@@ -183,14 +184,14 @@ if __name__ == '__main__':
                         # Create medium version
                         if settings.verbose:
                             print(medium_path)
-                        med_result = resize_image(jpg_file, medium_path, MEDIUM_SIZE, force_overwrite=settings.force_overwrite)
+                        med_result = resize_image(jpg_file, medium_path, MEDIUM_SIZE, force_overwrite=settings.force_overwrite, verbose=settings.verbose)
                         if med_result:
                             med_count +=1
                         
                         # Create thumbnail version
                         if settings.verbose:
                             print(thumbnail_path)
-                        thumb_result = resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE, force_overwrite=settings.force_overwrite)
+                        thumb_result = resize_image(jpg_file, thumbnail_path, THUMBNAIL_SIZE, force_overwrite=settings.force_overwrite, verbose=settings.verbose)
                         if thumb_result:
                             thumb_count += 1
         
