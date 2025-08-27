@@ -14,8 +14,9 @@ import url_gen
 CONFIG_FORMAT_REQUIRED = '3.0'
 
 # Image Configuration
-MEDIUM_SIZE = (800, 600)  # Medium image dimensions
-THUMBNAIL_SIZE = (150, 150)  # Thumbnail dimensions
+MEDIUM_SIZE = (900, 900)  # Medium image dimensions
+THUMBNAIL_SIZE = (390, 390)  # Thumbnail dimensions
+
 QUALITY = 85  # JPEG quality (1-100)
 
 def arg_setup():
