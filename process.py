@@ -51,12 +51,6 @@ def initialize_settings():
     input_path_override = args['input_path']
     #generate_derivatives = args['derivatives'] # not in settings class, not needed by powersorter
 
-    # use input_path arg to override input_path in config file
-    if input_path_override:
-        input_path = Path(input_path_override)
-    else:
-        input_path = None
-
     #Confirm force overwrite
     force_overwrite_confirmed = False
     if force_overwrite:
@@ -71,10 +65,14 @@ def initialize_settings():
             force_overwrite_confirmed = False
             sys.exit()
 
-    #TODO implement input_path override
     settings = ps.Settings(dry_run=dry_run, verbose=verbose, force_overwrite=force_overwrite_confirmed, debug=debug)
     #Load settings from config
     settings.load_config(config_file=config_file)
+
+    # use input_path arg to override input_path in config file
+    if input_path_override:
+        settings.input_path = Path(input_path_override)
+        print('Using input path as desgnated on command line (config overide):', settings.input_path)
 
     # Check required config_file version
     if not str(settings.config_format) == CONFIG_FORMAT_REQUIRED:
@@ -146,6 +144,7 @@ if __name__ == '__main__':
         print('Derivatives will not be generated, only sorting files (-s parameter)')
     else:
         print('Generating derivative JPG files...')
+        #print('TESTING - settings')
         med_count = 0
         thumb_count = 0
         for file_type, value in settings.file_types.items():
