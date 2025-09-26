@@ -1,0 +1,41 @@
+{
+    "versions": {
+        "config_format": "3.0"
+    },
+    "collection": {
+        "name": "JAUM",
+        "prefix": "",
+        "catalog_number_regex": "(?i)((?P<catNum>(?P<numerical>\\d+)))",
+        "web_base": "/corral-repl/projects/BRIT/web/JAUM",
+        "url_base": "https://web.corral.tacc.utexas.edu/brit/"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/Users/jbest/Desktop/JAUM_fix/jaum_log/",
+        "output_base_path": "/Users/jbest/Desktop/JAUM_fix/out",
+        "input_path": "/Users/jbest/Desktop/JAUM_fix/jaum_fix_files"
+    },
+    "file_types": {
+        "web_jpg": {
+            "file_regex": "(_(?P<suffix>a-z|0-9))*(\\.)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/JAUM/"
+        },
+        "web_jpg_med": {
+            "file_regex": "(_(?P<suffix>a-z|0-9))*(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/JAUM/"
+        },
+        "web_jpg_thumb": {
+            "file_regex": "(_(?P<suffix>a-z|0-9))*(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/JAUM/"
+        },
+        "archive_dng": {
+            "file_regex": "(_(?P<suffix>a-z|0-9))*(\\.)(?P<ext>dng)",
+            "output_sub_path": "archive/JAUM/"
+        },
+        "ocr": {
+            "file_regex": "(_(?P<suffix>a-z|0-9))*(_ocr)(\\.)(?P<ext>txt|json)",
+            "output_sub_path": "web/JAUM/"
+        }
+    }
+}

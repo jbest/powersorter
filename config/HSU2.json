@@ -1,0 +1,41 @@
+{
+    "versions": {
+        "config_format": "3.0"
+    },
+    "collection": {
+        "name": "HSU",
+        "prefix": "HSU",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>HSU)(-(?P<collID>X)-)*(?P<numerical>\\d+))",
+        "web_base": "/corral-repl/projects/TORCH/web/HSU/",
+        "url_base": "https://web.corral.tacc.utexas.edu/torch/"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/HSU/logs/",
+        "output_base_path": "/corral-repl/projects/TORCH/",
+        "input_path": "/corral-repl/projects/TORCH/staging/HSU/"
+    },
+    "file_types": {
+        "web_jpg": {
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/HSU/"
+        },
+        "web_jpg_med": {
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(_)(?P<size>med)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/HSU/"
+        },
+        "web_jpg_thumb": {
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(_)(?P<size>thumb)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/HSU/"
+        },
+        "archive_dng": {
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(\\.)(?i)(?P<ext>dng)",
+            "output_sub_path": "archive/HSU/"
+        },
+        "ocr": {
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(_ocr)(\\.)(?i)(?P<ext>txt|json)",
+            "output_sub_path": "web/HSU/"
+        }
+    }
+}

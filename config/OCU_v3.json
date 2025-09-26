@@ -3,39 +3,39 @@
         "config_format": "3.0"
     },
     "collection": {
-        "name": "UOBS",
-        "prefix": "UOBS",
-        "catalog_number_regex": "(?P<catNum>(?P<instID>UOBS)-(?P<numerical>\\d+))",
+        "name": "OCU",
+        "prefix": "OCU",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>OCU)-(?P<numerical>\\d+))",
         "web_base": "/corral-repl/projects/TORCH/web/",
         "url_base": "https://web.corral.tacc.utexas.edu/torch/"
     },
     "files": {
         "folder_increment": 1000,
         "number_pad": 7,
-        "log_directory_path": "/corral-repl/projects/TORCH/archive/UOBS/logs/",
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/OCU/logs/",
         "output_base_path": "/corral-repl/projects/TORCH/",
-        "input_path": "/corral-repl/projects/TORCH/staging/OKL/UOBS_ready_to_process/"
+        "input_path": "/corral-repl/projects/TORCH/staging/OKL/OCU_ready_to_process/"
     },
     "file_types": {
         "web_jpg": {
             "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>jpg|jpeg)",
-            "output_sub_path": "web/UOBS/"
+            "output_sub_path": "web/OCU/"
         },
         "web_jpg_med": {
             "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)",
-            "output_sub_path": "web/UOBS/"
+            "output_sub_path": "web/OCU/"
         },
         "web_jpg_thumb": {
             "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)",
-            "output_sub_path": "web/UOBS/"
+            "output_sub_path": "web/OCU/"
         },
         "archive_dng": {
             "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>dng)",
-            "output_sub_path": "archive/UOBS/"
+            "output_sub_path": "archive/OCU/"
         },
         "ocr": {
             "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_ocr)(\\.)(?P<ext>txt|json)",
-            "output_sub_path": "web/UOBS/"
+            "output_sub_path": "web/OCU/"
         }
     }
 }
