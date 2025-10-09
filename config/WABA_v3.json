@@ -5,7 +5,7 @@
     "collection": {
         "name": "WABA",
         "prefix": "WABA",
-        "catalog_number_regex": "(?P<catNum>(?P<numerical>\\d+))",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>WABA)(-(?P<collID>XX)-)*(?P<numerical>\\d+))",
         "web_base": "/corral-repl/projects/TORCH/web/",
         "url_base": "https://web.corral.tacc.utexas.edu/torch/"
     },
