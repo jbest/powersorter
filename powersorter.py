@@ -144,7 +144,9 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             print('DRY-RUN: Moved:', destination)
             status = 'DRY-RUN - simulated move'
             move_success = True
-            sort_logger.log(username=username, action='DRY_RUN-move', result='success', details='', filetype=filetype, source=source, destination=destination)
+            # log can be None in dry run for testing purposes
+            if sort_logger:
+                sort_logger.log(username=username, action='DRY_RUN-move', result='success', details='', filetype=filetype, source=source, destination=destination)
 
     else:
         # Create directory path if it doesn't exist
