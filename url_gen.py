@@ -1,4 +1,3 @@
-
 """
 urlgen (v3) takes an output log of powersorter.py (v3) and extracts all the web image paths
 and converts the paths into a web URL and an export file appropriate for 
@@ -76,14 +75,8 @@ def generate_url(file_base_path=None, file_path=None, url_base=None):
     Generate a URL using the file paths and URL base path.
     """
     #print(file_base_path, file_path, url_base)
-    common_path = os.path.commonpath([file_base_path, file_path])
-    #print('file_base_path:', file_base_path)
-    #print('file_path:', file_path)
-    #print('common_path:', common_path)
-    #web_base_path = os.path.realpath(file_base_path)
-    ### OLD # web_base_parent_path, common_dirname = os.path.split(common_path)
-    relative_path = os.path.relpath(file_path, start=common_path)
-    #relative_path = os.path.relpath(file_path, start=web_base_parent_path)
+    parent_path = os.path.dirname(file_base_path)
+    relative_path = os.path.relpath(file_path, start=parent_path)
     image_url = urljoin(url_base, relative_path)
     """
     print('file_path', file_path)
