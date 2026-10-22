@@ -18,23 +18,23 @@
     },
     "file_types": {
         "web_jpg": {
-            "file_regex": "(_(?i)(?P<suffix>[a-z]))*(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>[a-z]))*(\\.)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/LLC/"
         },
         "web_jpg_med": {
-            "file_regex": "(_(?i)(?P<suffix>[a-z]))*(_)(?P<size>med)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>[a-z]))*(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/LLC/"
         },
         "web_jpg_thumb": {
-            "file_regex": "(_(?i)(?P<suffix>[a-z]))*(_)(?P<size>thumb)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>[a-z]))*(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/LLC/"
         },
         "archive_dng": {
-            "file_regex": "(_(?i)(?P<suffix>[a-z]))*(\\.)(?i)(?P<ext>dng)",
+            "file_regex": "(_(?P<suffix>[a-z]))*(\\.)(?P<ext>dng)",
             "output_sub_path": "archive/LLC/"
         },
         "ocr": {
-            "file_regex": "(_(?i)(?P<suffix>[a-z]))*(_ocr)(\\.)(?i)(?P<ext>txt|json)",
+            "file_regex": "(_(?P<suffix>[a-z]))*(_ocr)(\\.)(?P<ext>txt|json)",
             "output_sub_path": "web/LLC/"
         }
     }
