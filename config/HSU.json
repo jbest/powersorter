@@ -18,23 +18,23 @@
     },
     "file_types": {
         "web_jpg": {
-            "file_regex": "(_(?P<suffix>.+))*(\\.)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(\\.)(?i)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/HSU/"
         },
         "web_jpg_med": {
-            "file_regex": "(_(?P<suffix>.+))*(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(_)(?P<size>med)(\\.)(?i)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/HSU/"
         },
         "web_jpg_thumb": {
-            "file_regex": "(_(?P<suffix>.+))*(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)",
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(_)(?P<size>thumb)(\\.)(?i)(?P<ext>jpg|jpeg)",
             "output_sub_path": "web/HSU/"
         },
         "archive_dng": {
-            "file_regex": "(_(?P<suffix>.+))*(\\.)(?P<ext>dng)",
+            "file_regex": "(_(?P<suffix>[a-zA-Z]))*(\\.)(?i)(?P<ext>dng)",
             "output_sub_path": "archive/HSU/"
         },
         "ocr": {
-            "file_regex": "(_(?P<suffix>.+))*(_ocr)(\\.)(?P<ext>txt|json)",
+            "file_regex": "(_(?P<suffix>[a-zA-z]))*(_ocr)(\\.)(?i)(?P<ext>txt|json)",
             "output_sub_path": "web/HSU/"
         }
     }

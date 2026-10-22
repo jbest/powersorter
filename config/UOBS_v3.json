@@ -5,7 +5,7 @@
     "collection": {
         "name": "UOBS",
         "prefix": "UOBS",
-        "catalog_number_regex": "(?P<catNum>(?P<instID>UOBS)-(?P<numerical>\\d+))",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>UOBS)-(-(?P<collID>[A-Z])-)?(?P<numerical>\\d+))",
         "web_base": "/corral-repl/projects/TORCH/web/",
         "url_base": "https://web.corral.tacc.utexas.edu/torch/"
     },
