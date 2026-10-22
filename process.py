@@ -109,7 +109,7 @@ def resize_image(input_path, output_path, size, maintain_aspect=True, force_over
                 img = img.resize(size, Image.Resampling.LANCZOS)
             
             # Convert to RGB if necessary (handles RGBA, P mode images)
-            if img.mode in ('RGBA', 'P'):
+            if img.mode not in ('RGB', 'L', 'CMYK'):
                 img = img.convert('RGB')
             
             # Save the resized image
@@ -140,8 +140,19 @@ if __name__ == '__main__':
 
     # generate derivs
     #TODO pass values for resize based on config params
+    # fail early on a bad input path - os.walk would silently find nothing
+    if not Path(settings.input_path).is_dir():
+        print(f'ERROR: input directory {settings.input_path} does not exist.')
+        sys.exit(1)
+    if not os.access(settings.log_directory_path, os.W_OK | os.X_OK):
+        print(f'ERROR: unable to write to log directory: {settings.log_directory_path}')
+        sys.exit(1)
+
     if sort_only:
         print('Derivatives will not be generated, only sorting files (-s parameter)')
+    elif settings.dry_run:
+        # derivatives are written into the input directory, so skip them on a dry run
+        print('DRY-RUN: derivatives will not be generated (use -s to silence this message)')
     else:
         print('Generating derivative JPG files...')
         #print('TESTING - settings')
@@ -152,8 +163,7 @@ if __name__ == '__main__':
             if file_type=='web_jpg':
                 # get the file regex for this particular file type
                 file_regex = value.get('file_regex', None)
-                # Adding regex i flag here to make case-insensitive rather than in config files
-                regex = '(?i)' + settings.catalog_number_regex + file_regex
+                regex = ps.build_regex(settings.catalog_number_regex, file_regex)
                 #testing
                 if settings.debug:
                     print('DEBUG')
@@ -161,6 +171,9 @@ if __name__ == '__main__':
                     print('full regex:', regex)
                 output_sub_path = value.get('output_sub_path', None)
                 output_path = settings.output_base_path.joinpath(output_sub_path)
+                if settings.verbose:
+                    print('output_sub_path:', output_sub_path)
+                    print('output_path:', output_path)                
                 # Check ability to write to directory
                 if not os.access(output_path, os.W_OK | os.X_OK):
                     #TODO log fail

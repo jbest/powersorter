@@ -16,6 +16,8 @@ from urllib.parse import urljoin
 from pathlib import Path
 import json
 
+import powersorter as ps
+
 #FILE_BASE_PATH = '/corral-repl/projects/TORCH/web/'
 #URL_BASE = 'https://web.corral.tacc.utexas.edu/torch/'
 DEFAULT_THUMB_EXT = '_thumb'
@@ -42,6 +44,7 @@ class Settings():
         #self.prefix = prefix
         #self.dry_run = dry_run
         self.verbose = verbose
+        self.debug = False # write_url_file reads settings.debug
         #self.force_overwrite = force_overwrite
 
     def load_config(self, config_file=None):
@@ -127,10 +130,9 @@ def generate_url_records(file_base_path=None, url_base=None):
     return occurrence_set
 
 def match_pattern(text=None, settings=None):
-    # Adding regex i flag here to make case-insensitive rather than in config files
-    web_jpg_pattern = re.compile('(?i)' + settings.catalog_number_regex + settings.web_jpg_regex)
-    web_jpg_med_pattern = re.compile('(?i)' + settings.catalog_number_regex + settings.web_jpg_med_regex)
-    web_jpg_thumb_pattern = re.compile('(?i)' + settings.catalog_number_regex + settings.web_jpg_thumb_regex)
+    web_jpg_pattern = re.compile(ps.build_regex(settings.catalog_number_regex, settings.web_jpg_regex))
+    web_jpg_med_pattern = re.compile(ps.build_regex(settings.catalog_number_regex, settings.web_jpg_med_regex))
+    web_jpg_thumb_pattern = re.compile(ps.build_regex(settings.catalog_number_regex, settings.web_jpg_thumb_regex))
 
     # test image patterns
     match = None

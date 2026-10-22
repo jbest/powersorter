@@ -62,6 +62,14 @@ class SortLogger():
                     'destination': destination
                 })
 
+def build_regex(catalog_number_regex=None, file_regex=None):
+    """
+    Combine the catalog number and file regex into one case-insensitive pattern.
+    The (?i) flag must be at the start of the whole expression (Python 3.11+),
+    so any inline (?i) left in a config file is removed.
+    """
+    return '(?i)' + catalog_number_regex.replace('(?i)', '') + file_regex.replace('(?i)', '')
+
 def scan_files(path=None, pattern=None, file_type=None):
     """
     Scan the directory for files matching the provided pattern.
@@ -217,8 +225,7 @@ def sort(input_path=None, number_pad=None, folder_increment=None, catalog_number
         #print('file_type', file_type, 'value', value)
         #regex = value.get('regex', None)
         file_regex = value.get('file_regex', None)
-        # Adding regex i flag here to make case-insensitive rather than in config files
-        regex = '(?i)' + catalog_number_regex + file_regex
+        regex = build_regex(catalog_number_regex, file_regex)
         output_sub_path = value.get('output_sub_path', None)
         output_path = destination_base_path.joinpath(output_sub_path)
         # Check ability to write to directory
@@ -361,11 +368,12 @@ if __name__ == '__main__':
         sort_logger=sort_logger,
         force_overwrite=settings.force_overwrite,
         username=username,
-        dry_run=settings.dry_run)
+        dry_run=settings.dry_run,
+        verbose=settings.verbose)
     # Summary report
     print('SORT COMPLETE')
     print('sort_result:', sort_result)
     if verbose:
-        print('sorted_file_count', sorted_file_count)
-        print('unmoved_file_count', unmoved_file_count)
+        print('sorted_file_count', sort_result['sorted_file_count'])
+        print('unmoved_file_count', sort_result['unmoved_file_count'])
     print('Log file written to:', sort_logger.filename)
