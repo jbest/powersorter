@@ -306,9 +306,24 @@ Decision: one WBU config only. The local `config/WBU_v3.json` takes the catalog 
 commit `44ae309`. `WBU-V_v3.json` was removed from the local `config/`. Tested against
 `WBU-V-123.jpg`, `_a.jpg`, `_med.jpg`, `_a_med.jpg`, `_thumb.jpg`, `.dng`, `_ocr.txt`.
 
-**Still to do on the server:** copy the new `WBU_v3.json` over the old one and remove
-`WBU-V_v3.json`, after backing both up and checking that nothing refers to
-`WBU-V_v3.json` by name.
+**Deployed 2026-10-29:** the new `WBU_v3.json` was copied to the server (checksum matches the
+repo copy) and `WBU-V_v3.json` was removed from the server `config/`. Nothing on the server
+referred to either by name. Both originals are in
+`tools/backup_2026-10-29_wbu/`; roll back by copying them into `config/`. The server and
+local `config/` now agree on WBU.
+
+A dry run (`process.py -c config/WBU_v3.json -n -v`, using the real
+`staging/WBU/ready_to_sort/`) exited 0 with 0 files matched. That is correct: the only files
+there are 8 `WBU-V-0026x (2).JPG/.dng` files whose ` (2)` does not fit the pattern. They look
+like duplicates of images already sorted on 2026-08-07. This run therefore proves the config
+loads, not the regex; the regex was checked locally against sample names.
+
+**Open on the server (not changed):**
+- `web/WBU/WBU00000/` holds 3 files (`WBU-V-00001.jpg`, `_med`, `_thumb`) written on
+  2026-05-05 by the old config (prefix `WBU`). The real folder is `web/WBU/WBU-V-00000/` (978
+  files). Check whether the 3 files duplicate ones there, then remove the stray folder.
+- Decide what to do with the 8 ` (2)` files in staging (compare with the sorted copies first).
+- Stale WBU logs in `archive/WBU/logs/` use prefixes `WBU_` (old config) and `WBU-V_`.
 
 ### New layout
 - `config/` mirrors the server's `tools/config/` exactly (45 files including `old/` and
