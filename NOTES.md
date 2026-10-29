@@ -454,3 +454,45 @@ files already imported into Symbiota.
   JWC, LAMU, LL, LLC, NPS-WABA, NTSC, NWOSU, PAUH, SEU, SHST, SRSC, SWT, TAC, TAIC, TAMUCC,
   TCSW, TEX, TLU, UARK, UHCC, UTEP, WTS, shared, temp. LLC and SRSC have v3 configs in
   `config_local_old/` that were never deployed (SRSC's copies LLC's prefix and paths).
+
+## 10. Pick up here (state as of 2026-10-29, end of session)
+
+### Done
+- Repo and TACC `tools/` match for `process.py`, `powersorter.py`, `url_gen.py`, `config_gen.py`.
+  `config/` mirrors the server except the fixed single `WBU_v3.json`, which is deployed to the
+  server too (sections 7 and 8). Previous repo configs are in `config_local_old/`.
+- Code fixes 1.1 (failed move logged as `fail`), 1.3 (`web_base` trailing slash) and 1.4
+  (anchored `file_regex`) are in the repo and deployed. Unit tests: `python -m unittest
+  discover tests` (13 tests, standard library only, pass on Python 3.9 and 3.12).
+- The code runs on Python 3.9 (section 7). The README says 3.9+.
+- Audit of folder names against configs (section 9).
+- Workflow for working on TACC from Claude Code: section 6 (SSH control socket).
+
+### To do, config fixes (decided, not started; section 9)
+1. `NOSU_v3`, `OCLA_v3`, `OCU_v3`, `WOH_v3`: change `prefix` to `NOSU-`, `OCLA-`, `OCU-`, `WOH-`.
+2. `WABA_v3`: `number_pad: 6`.
+3. Before deploying 1 and 2, check in Symbiota that existing records for those collections
+   point at the hyphenated or 6-digit folders.
+4. Confirm the intent of `VDB_v3` (`prefix: BRIT`, web output to `web/BRIT/`), and whether
+   `UTPB_v3_WIP` can be dropped.
+5. Add a config check (`config_check.py`, NOTES 2.7) with a self-test of sample file names and
+   the expected destination folder, so mismatches like those in section 9 are caught by a
+   test instead of an audit. Fix `VDB_v3`'s `.+` suffix (issue 1.5) at the same time.
+
+### Waiting on a decision
+- **TAES:** 2,509 catalog numbers (10,036 files) in `staging/TAES/ready_to_sort/` already
+  exist in `web/TAES/`. A real run now logs them as `fail` and emits no URL (section 8).
+  Decide: overwrite with `-f`, or remove from staging after comparing with the sorted copies.
+- **WBU:** the orphan `web/WBU/WBU00000/` folder and the 8 ` (2)` files in staging
+  (section 7). Check Symbiota for `WBU-V-00001` before removing anything.
+- **OKL:** two folder schemes (section 9). Leave as is unless the URLs are renumbered.
+
+### Remaining items from section 1
+1.2 (inconsistent `if sort_logger` guard), 1.5 (`.+` suffix, only `VDB_v3`), 1.6 (URL file is
+written to the current directory), 1.7 to 1.18 (see above). Section 4 steps 3 to 6 stand.
+
+### Still open from the section 5 checklist
+- Number-pad and permissions facts are now recorded (sections 7 and 9), but group ownership and
+  umask for files written by different users has not been looked at.
+- Untracked laptop-only items from section 5 (`*_old.py`, `*CB*.py`, tarball, `env/`,
+  `staging*/`) have still not been reviewed.
