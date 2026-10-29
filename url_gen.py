@@ -76,9 +76,18 @@ class Settings():
 def generate_url(file_base_path=None, file_path=None, url_base=None):
     """
     Generate a URL using the file paths and URL base path.
+
+    url_base maps to the web root, the directory that holds the collection directories
+    (web/BRIT/BRIT0001000/BRIT1234.jpg is served at <url_base>BRIT/BRIT0001000/BRIT1234.jpg).
+    file_base_path may be that web root or the collection directory inside it, with or
+    without a trailing slash. A sorted file always sits in a numbered folder directly under
+    the collection directory, so a file two levels below file_base_path means file_base_path
+    is the collection directory and the web root is its parent.
     """
     #print(file_base_path, file_path, url_base)
-    parent_path = os.path.dirname(file_base_path)
+    base_path = file_base_path.rstrip('/') or '/'
+    depth = len(os.path.relpath(file_path, start=base_path).split(os.sep))
+    parent_path = os.path.dirname(base_path) if depth <= 2 else base_path
     relative_path = os.path.relpath(file_path, start=parent_path)
     image_url = urljoin(url_base, relative_path)
     """

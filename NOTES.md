@@ -18,8 +18,17 @@ Within each section, items are ordered roughly by importance.
 2. **`PermissionError`/other failures lose detail only partly**: they are logged, but
    `move_file` calls `sort_logger.log` unguarded while the dry-run branch guards
    `if sort_logger`. Pick one convention.
-3. **`web_base` trailing slash changes the URLs (verified).** `url_gen.generate_url`
-   takes `os.path.dirname(web_base)` as the root:
+3. **FIXED 2026-10-29** (`tests/test_generate_url.py`): `generate_url` now gives the same URL
+   for every `web_base` form. If the file is two levels below `web_base` (numbered folder,
+   file), `web_base` is the collection directory and the web root is its parent; otherwise
+   `web_base` is the root. No config changes are needed. Checked against all 48 configs:
+   the old code was wrong for 10, including the live server config `TAES_v3.json` (trailing
+   slash, collection dir), which the table below did not list. The server's
+   `TAES_ready_to_sort_2026-07-31T145222_DRY-RUN_urls.csv` has all 12,820 URLs missing
+   `TAES/`. The three remaining mismatches are local-machine configs whose `web_base` is a
+   server path while `output_base_path` is a laptop path (inconsistent, a job for the config
+   validator). The server's `url_gen.py` is still the old version until deployed.
+   Original description: `url_gen.generate_url` takes `os.path.dirname(web_base)` as the root:
 
    | `web_base` | URL for `.../web/BRIT/BRIT0001000/BRIT1234.jpg` |
    |---|---|
@@ -223,8 +232,8 @@ differences into: only in repo, only on server, differs. Decide the canonical se
 (NOTES section 2, step 1) before editing configs.
 
 ### Suggested order
-1. Data-correctness fixes: ~~1.1 (failed move logged as `success`)~~ done, 1.3 (`web_base`
-   trailing slash in `url_gen.generate_url`), 1.4 (anchor `file_regex`).
+1. Data-correctness fixes: ~~1.1 (failed move logged as `success`)~~ done, ~~1.3 (`web_base`
+   trailing slash in `url_gen.generate_url`)~~ done, 1.4 (anchor `file_regex`).
 2. Standardize configs (section 2, steps 1-4), using the server facts above.
 3. Add `config_check.py` and pytest tests, run against every config.
 4. `.gitignore`, `requirements.txt`, remove or archive the stray scripts.
