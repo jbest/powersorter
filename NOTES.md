@@ -176,3 +176,56 @@ Suggested steps:
 5. Move URL output to the log directory, add the unmatched-files report, add the
    log-driven undo script.
 6. Refactor: shared `Settings`, single directory walk, config inheritance.
+
+## 5. Handoff: state as of 2026-10-29 and next session checklist
+
+### State of the repo
+- `main` is at `3d6c8d1` (docs) on top of `8baf0e8`, which synced `config_gen.py`,
+  `BRIT_v3.json`, `HSU.json`, `OKLA_v3.json` and `UOBS_v3.json` to the TACC copies in
+  `/corral-repl/projects/TORCH/tools` (on `data.tacc.utexas.edu`).
+- No code fixes from section 1 have been made yet. The only code changes so far are
+  `5a57d0b` (`build_regex`, dry-run and standalone bugs) and the regex fixes in `44ae309`.
+- `WBU_v3.json` differs from the server copy on purpose. The reason was not recorded, so
+  ask before changing it.
+- Everything marked untracked in `git status` (CSV outputs, `env/`, `archive/`, `web/`,
+  `input_dir/`, `*_old.py`, `*CB*.py`, `*_jb.py`, `url_gen_latest.py`, `url_gen_uknown.py`,
+  `url_gen_old.py`, `check_permissions.py`, `config/WBU_v3_test.json`,
+  `powersorter_update_2026-10-22.tar.gz`) exists only on the original laptop. Not reviewed
+  in detail. Check what the tarball and `url_gen_latest.py` / `url_gen_uknown.py` contain
+  before deleting anything, since they may be snapshots of server code.
+
+### Things to read off the TACC server (not derivable from this repo)
+Run these on `data.tacc.utexas.edu` and record the results in this file:
+
+```bash
+cd /corral-repl/projects/TORCH/tools
+ls -la . config 2>/dev/null           # which scripts/configs are deployed
+python3 --version; which python3      # needs 3.11+ (see README)
+python3 -c "import PIL; print(PIL.__version__)"
+
+# number_pad per collection (NOTES 2, step 3): folder names should show the real padding
+for c in /corral-repl/projects/TORCH/web/*/; do echo "$c"; ls "$c" | head -3; done
+
+# directories each config needs, with owner/group/mode
+ls -ld /corral-repl/projects/TORCH/{web,archive,staging}/*/ \
+       /corral-repl/projects/TORCH/archive/*/logs
+```
+
+Compare every file in `config/` with the server copy, for example
+`diff -r <repo>/config /corral-repl/projects/TORCH/tools/config`, and sort the
+differences into: only in repo, only on server, differs. Decide the canonical set
+(NOTES section 2, step 1) before editing configs.
+
+### Suggested order
+1. Data-correctness fixes: 1.1 (failed move logged as `success`), 1.3 (`web_base`
+   trailing slash in `url_gen.generate_url`), 1.4 (anchor `file_regex`).
+2. Standardize configs (section 2, steps 1-4), using the server facts above.
+3. Add `config_check.py` and pytest tests, run against every config.
+4. `.gitignore`, `requirements.txt`, remove or archive the stray scripts.
+
+### Testing without touching real data
+`gen_test_files.sh` creates sample files in `./input_dir`. Always dry-run first:
+`python process.py -c config/<X>.json -n -v`. A dry run still writes a log to
+`log_directory_path` and needs that directory to exist and be writable.
+Remember to point `-i` at a scratch directory rather than the real `staging/` area when
+experimenting on TACC.
