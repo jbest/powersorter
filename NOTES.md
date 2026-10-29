@@ -408,3 +408,49 @@ after confirming the server copy was the previous repo version. Backup in
 `tools/backup_2026-10-29_anchor/`. The checksum matches the repo and `build_regex` imports and
 returns the anchored pattern under the server's Python 3.9.21. `process.py` and `url_gen.py`
 on the server already matched the repo. No dry run was done after this deploy.
+
+## 9. Audit of `web/` and `archive/` folder names vs config (2026-10-29, read-only)
+
+For each v3 config on the server, the folder name `prefix + zfill(number_pad)` was compared
+with the folders that exist under `web/<COLL>/` and `archive/<COLL>/` (directory names only).
+The code builds names as `prefix + str(number // increment * increment).zfill(number_pad)`:
+`int()` drops leading zeros and `zfill` only pads up, so a number wider than `number_pad`
+just gets a longer name (OKLA's 8-digit folders are normal).
+
+**Match (no action):** BCNWR, BRIT, DUR, HSU, SAT, TAES, UOBS, UTPB, TTC (pad 6), WBU (`WBU-V-`,
+pad 5). CHIC is new and empty (only `archive/CHIC/logs`). OKLA: 40 seven-digit and 51
+eight-digit folders, all consistent with pad 7.
+
+**Would create a parallel set of folders (config needs changing before a real run):**
+
+| Config | Existing folders | Config produces | Fix |
+|---|---|---|---|
+| `NOSU_v3` | `NOSU-0000000` (4 web, 4 archive) | `NOSU0000000` | `prefix: "NOSU-"` |
+| `OCLA_v3` | `OCLA-0000000` (20) | `OCLA0000000` | `prefix: "OCLA-"` |
+| `OCU_v3` | `OCU-0000000` (2) | `OCU0000000` | `prefix: "OCU-"` |
+| `WOH_v3` | `WOH-0000000` (15) | `WOH0000000` | `prefix: "WOH-"` |
+| `WABA_v3` | `WABA000000` (1, 6 digits, 1,368 files) | `WABA0000000` | `number_pad: 6` |
+
+The hyphen collections have catalog numbers like `NOSU-0000001.jpg`, so the hyphen belongs
+in the folder prefix, not only in the catalog regex. Check the Symbiota URLs of existing
+records before changing anything; the fix makes new sorts land in the existing folders.
+
+**OKL has two folder schemes (not a current-config problem):** 80 eight-digit folders
+(`OKL20065000`, files `OKL-20065000.jpg`, the current naming) and 30 nine-digit folders with
+a leading zero (`OKL010087000`, `OKL020001000`, files `OKL010087919.jpg`, a legacy name with no
+hyphen, folders dated 2022). 14 numeric blocks exist in both forms, for example
+`OKL020005000` (1,200 files) and `OKL20005000` (15 files). The current regex requires `OKL-`,
+so legacy files are never matched or re-sorted. Not touched. Merging would change URLs of
+files already imported into Symbiota.
+
+**Other observations:**
+- `VDB_v3`: `prefix: "BRIT"` and web output `web/BRIT/` (the same directory as BRIT), but
+  archive output `archive/VDB/`. Confirm that is intended.
+- `UTPB_v3.0` and `UTPB_v3_WIP` point at identical directories (one is redundant).
+- Leftover non-numbered folders: `web/BRIT/brit-bucket-test`, `web/OCU/OCU_barcode_missing`,
+  `archive/OCU/OCU_barcode_missing`, `archive/OKLA/OK20260424_SH_A`, and
+  `archive/TEST/BRIT0001000` (test output).
+- 32 directories under `web/` have no v3 config: ACU, AMIS, ASTC, BAYLU, CAMU, CSU, FWNC, HPC,
+  JWC, LAMU, LL, LLC, NPS-WABA, NTSC, NWOSU, PAUH, SEU, SHST, SRSC, SWT, TAC, TAIC, TAMUCC,
+  TCSW, TEX, TLU, UARK, UHCC, UTEP, WTS, shared, temp. LLC and SRSC have v3 configs in
+  `config_local_old/` that were never deployed (SRSC's copies LLC's prefix and paths).
