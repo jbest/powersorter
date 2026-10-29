@@ -318,10 +318,22 @@ there are 8 `WBU-V-0026x (2).JPG/.dng` files whose ` (2)` does not fit the patte
 like duplicates of images already sorted on 2026-08-07. This run therefore proves the config
 loads, not the regex; the regex was checked locally against sample names.
 
+**Decision: WBU keeps the `-V` in its prefix (`WBU-V-`).** Most collections do not put a
+collection code in the file name, but WBU is the Vascular collection and a lot has already
+been sorted as `WBU-V-NNNNN` into `web/WBU/WBU-V-00000/` (978 files, plus the 2026-08-07
+run). The config stays `prefix: "WBU-V-"`, `number_pad: 5`. This had been a sticking point
+for the collection; do not revisit without a reason to renumber.
+
 **Open on the server (not changed):**
-- `web/WBU/WBU00000/` holds 3 files (`WBU-V-00001.jpg`, `_med`, `_thumb`) written on
-  2026-05-05 by the old config (prefix `WBU`). The real folder is `web/WBU/WBU-V-00000/` (978
-  files). Check whether the 3 files duplicate ones there, then remove the stray folder.
+- `web/WBU/WBU00000/` is an orphan from the earlier `WBU` prefix, not a duplicate to delete
+  blindly. It holds `WBU-V-00001.jpg`, `_med` and `_thumb`, moved there by a real run by
+  `jbest` on 2026-05-05 (`archive/WBU/logs/WBU_ready_to_sort_2026-05-05T105714.csv`). The
+  `.jpg` has the same checksum as the copy in `WBU-V-00000/`; the `_med` and `_thumb` differ
+  (regenerated later). `tools/WBU_ready_to_sort_2026-05-05T105714_urls.csv` contains
+  `WBU00000` URLs and is not in `tools/uploaded_url_files/`, so it was probably never
+  imported, but that cannot be confirmed from the server. **Before removing the folder,
+  check the Symbiota record for `WBU-V-00001` and make sure its images do not point at
+  `.../WBU00000/...`.**
 - Decide what to do with the 8 ` (2)` files in staging (compare with the sorted copies first).
 - Stale WBU logs in `archive/WBU/logs/` use prefixes `WBU_` (old config) and `WBU-V_`.
 
