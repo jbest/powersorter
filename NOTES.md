@@ -530,3 +530,22 @@ To be communicated by jbest; nothing has been sent from this repo. Status: not y
 3. **Symbiota check for `WBU-V-00001`.** Which image URLs do the WBU records have? The images
    were first sorted on 2026-05-05 into `web/WBU/WBU00000/` and again on 2026-08-07 into
    `web/WBU/WBU-V-00000/`. Only after this is known can the `WBU00000` folder be removed.
+
+### WBU dry run with correctly named test files (2026-10-29)
+`process.py -c config/WBU_v3.json -i <scratch dir> -n -v` on the server, with 11 empty files in a
+scratch directory (removed afterwards; the real staging was not touched). Exit 0.
+- Sorted (simulated) 7, collision 1, ignored 3 (11 files). Destinations were right:
+  `WBU-V-00500.JPG`, `_med`, `_thumb`, `_ocr.txt` and `WBU-V-00501_a.JPG` into
+  `web/WBU/WBU-V-00000/`, `WBU-V-00500.dng` into `archive/WBU/WBU-V-00000/`, and
+  `WBU-V-01001.JPG` into the next block, `web/WBU/WBU-V-01000/`.
+- `WBU-V-00255.JPG` (already sorted) was reported as "file exists". A dry run still logs that
+  as `success`; a real run logs `fail` and emits no URL (section 8).
+- Ignored silently: `WBU-V-00261 (2).JPG`, `WBU-V-00502.jpg.bak`, `WBU-V-00503.jpgx`. This
+  confirms the anchored regex on real server Python (3.9.21) and the earlier finding that
+  nothing reports unmatched files (NOTES 1.14).
+- URL file: `.../torch/WBU/WBU-V-00000/WBU-V-00500.JPG`, `_med.jpg`, `_thumb.jpg`; the suffixed
+  `_a` file gets its own row. The URL generator prints `No match:` for the `.dng` and `_ocr.txt`
+  names, which is harmless (it only builds URLs for the three `web_jpg*` types).
+- The dry run left one log: `archive/WBU/logs/WBU-V-_wbu_dryrun_test_2026-10-29T181013_DRY-RUN.csv`
+  (a dry-run log from this test, safe to delete).
+So the `WBU_v3.json` regex is now proven on the server. The 8 ` (2)` files still need renaming.
