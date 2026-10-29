@@ -517,3 +517,16 @@ To sort them, rename each to drop ` (2)` (for example `WBU-V-00261 (2).JPG` to
 `WBU-V-00261.JPG`; the sorted JPGs keep their upper-case `.JPG`) and run a dry run first. First
 confirm with whoever shot the batch that ` (2)` means "re-shot / second copy" and not a second
 image of the same specimen, which would need a suffix such as `_a` instead.
+
+### WBU issues to raise with Matthew Allen (WBU) (2026-10-29)
+To be communicated by jbest; nothing has been sent from this repo. Status: not yet answered.
+1. **` (2)` files.** `WBU-V-00261 (2).JPG/.dng` to `WBU-V-00264 (2).JPG/.dng` are in
+   `staging/WBU/ready_to_sort/Upload_3-24-26/`. They are the only copies of those four
+   specimens' images (nothing sorted for `00261` to `00264`). Question: what does ` (2)`
+   mean (re-shot or second copy, vs a second image of the same specimen)? The answer decides
+   between a plain rename and a suffix such as `_a`. Ask that future batches not add ` (2)`.
+2. **`WBU-V-` prefix.** Confirm that WBU files are always named `WBU-V-NNNNN` (the folder
+   prefix and the catalog regex both depend on it; see "Decision: WBU keeps the `-V`").
+3. **Symbiota check for `WBU-V-00001`.** Which image URLs do the WBU records have? The images
+   were first sorted on 2026-05-05 into `web/WBU/WBU00000/` and again on 2026-08-07 into
+   `web/WBU/WBU-V-00000/`. Only after this is known can the `WBU00000` folder be removed.
