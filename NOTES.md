@@ -142,7 +142,7 @@ Suggested steps:
   config. A single `torch_root` setting (or an environment variable) would make
   moving projects or testing a copy easy. `JAUM` already lives under
   `/corral-repl/projects/BRIT/`, which is evidence that paths do change.
-- **Python on TACC**: the code needs 3.11+. Record how it is provided on the
+- **Python on TACC**: the code runs on 3.9+ (tested, see section 7). Record how it is provided on the
   data node (module, conda env, venv) and add a `requirements.txt` (Pillow). Not
   captured in the repo yet.
 - **Permissions and group ownership**: moved files keep the owner and mode of whoever
@@ -204,7 +204,7 @@ Run these on `data.tacc.utexas.edu` and record the results in this file:
 ```bash
 cd /corral-repl/projects/TORCH/tools
 ls -la . config 2>/dev/null           # which scripts/configs are deployed
-python3 --version; which python3      # needs 3.11+ (see README)
+python3 --version; which python3      # 3.9+ is enough (see section 7)
 python3 -c "import PIL; print(PIL.__version__)"
 
 # number_pad per collection (NOTES 2, step 3): folder names should show the real padding
@@ -332,7 +332,21 @@ loads, not the regex; the regex was checked locally against sample names.
   `*_local` configs) so nothing is lost.
 
 ### Python on the server
-System `python3` is 3.9.21 with no Pillow. `tools/env` is a venv on Python 3.9.21 with
-Pillow 11.3.0. README and NOTES say 3.11+ is required for the regex handling. That claim is
-unverified: `build_regex` removes inline `(?i)` and puts one at the start, which also works
-on 3.9. Test under 3.9 before relying on either statement.
+System `python3` is 3.9.21 with no Pillow. `tools/env` is a venv (a symlink to the system
+`/usr/bin/python3`, so also 3.9.21) with Pillow 11.3.0. No newer Python is installed on the
+data node. The laptop's local `env/` is 3.12.3, which is probably where the old "3.11+" wording
+came from.
+
+**Tested 2026-10-29: the code works on 3.9.21.** `process.py -n -v` ran end to end on the
+server with `tools/env/bin/python`. A separate test loaded every v3 config in `config/`
+(21 configs, 105 regexes) and ran `build_regex` with `DeprecationWarning`/`FutureWarning`
+raised as errors. All compiled, and 656 filename/config combinations (`.jpg`, `.JPG`,
+`_med`, `_thumb`, `_a`, `.dng`, `_ocr.txt`, `.jpg.bak`) matched identically on 3.9.21 and
+3.12.3. A mid-pattern `(?i)` compiles with a `DeprecationWarning` on 3.9 but is a hard
+`re.error` on 3.12, which is why `build_regex` strips it. README now says 3.9+.
+
+The same test confirmed two section 1 bugs against the server configs:
+- **1.5:** `VDB_v3.json` uses the `.+` suffix, so `BRIT123_med.jpg` and `_thumb.jpg` also
+  match `web_jpg`. It is the only config where this showed up.
+- **1.4:** `X123.jpg.bak` matches in at least 14 of the 21 configs (the other 7 matched
+  none of the sample names, so nothing can be said about them).

@@ -42,7 +42,8 @@ Given a "ready to sort" directory of files named by catalog number
 
 ## Requirements
 
-- Python 3.11+ (the regex handling is written for 3.11's stricter flag rules)
+- Python 3.9+ (tested on 3.9.21, the version on the TACC data node, and 3.12.3). The regex
+  handling avoids a mid-pattern `(?i)`, which 3.11+ rejects.
 - Pillow (`pip install pillow`), needed only by `process.py`
 - Unix-like OS (`pwd` is used to record the username)
 
