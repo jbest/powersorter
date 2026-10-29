@@ -6,7 +6,9 @@ Within each section, items are ordered roughly by importance.
 
 ## 1. Bugs and sharp edges in the code
 
-1. **Existing-file collisions are logged as `success`** (`powersorter.py`, `move_file`,
+1. **FIXED 2026-10-29** (`tests/test_move_file.py`; the fix logs `result=status`). The dry-run
+   branch still logs `success` on purpose, as described below.
+   **Existing-file collisions are logged as `success`** (`powersorter.py`, `move_file`,
    the `destination.exists() and not force_overwrite` branch). The move fails
    (`status='fail'`) but the logger is called with `result='success'`. `url_gen` only
    keeps rows with `result == 'success'`, so a URL is emitted for the file that was
@@ -221,7 +223,7 @@ differences into: only in repo, only on server, differs. Decide the canonical se
 (NOTES section 2, step 1) before editing configs.
 
 ### Suggested order
-1. Data-correctness fixes: 1.1 (failed move logged as `success`), 1.3 (`web_base`
+1. Data-correctness fixes: ~~1.1 (failed move logged as `success`)~~ done, 1.3 (`web_base`
    trailing slash in `url_gen.generate_url`), 1.4 (anchor `file_regex`).
 2. Standardize configs (section 2, steps 1-4), using the server facts above.
 3. Add `config_check.py` and pytest tests, run against every config.

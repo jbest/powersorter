@@ -34,6 +34,7 @@ Given a "ready to sort" directory of files named by catalog number
 | `config_gen.py` | Prints an example v3 config JSON to stdout. |
 | `image_resizer.py` | Older standalone resizer, superseded by `resize_image` in `process.py`. |
 | `config/*.json` | One config per collection (see below). `config/old/` holds retired v1/v2 formats. |
+| `tests/` | Unit tests (standard library `unittest`, no extra install): `python -m unittest discover tests` |
 | `regex_notes.txt`, `gen_test_files.sh` | Scratch notes and a script to create test files in `./input_dir`. |
 
 `old_powersort.py`, `powersorterCB.py`, `process_CB_old.py`, `process_new.py`,

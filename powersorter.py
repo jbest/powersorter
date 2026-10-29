@@ -167,7 +167,7 @@ def move_file(source=None, destination_directory=None, filename=None, filetype=N
             move_success = False
             status = 'fail'
             details = 'filename exists'
-            sort_logger.log(username=username, action='move', result='success', details=details, filetype=filetype, source=source, destination=destination)
+            sort_logger.log(username=username, action='move', result=status, details=details, filetype=filetype, source=source, destination=destination)
 
         else:
             try:
