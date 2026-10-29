@@ -25,9 +25,9 @@ Within each section, items are ordered roughly by importance.
    the old code was wrong for 10, including the live server config `TAES_v3.json` (trailing
    slash, collection dir), which the table below did not list. The server's
    `TAES_ready_to_sort_2026-07-31T145222_DRY-RUN_urls.csv` has all 12,820 URLs missing
-   `TAES/`. The three remaining mismatches are local-machine configs whose `web_base` is a
+   `TAES/`. (Deployed to the server 2026-10-29, see section 8.) The three remaining mismatches are local-machine configs whose `web_base` is a
    server path while `output_base_path` is a laptop path (inconsistent, a job for the config
-   validator). The server's `url_gen.py` is still the old version until deployed.
+   validator).
    Original description: `url_gen.generate_url` takes `os.path.dirname(web_base)` as the root:
 
    | `web_base` | URL for `.../web/BRIT/BRIT0001000/BRIT1234.jpg` |
@@ -373,3 +373,24 @@ The same test confirmed two section 1 bugs against the server configs:
   match `web_jpg`. It is the only config where this showed up.
 - **1.4:** `X123.jpg.bak` matches in at least 14 of the 21 configs (the other 7 matched
   none of the sample names, so nothing can be said about them).
+
+## 8. Deploy of the 1.1 and 1.3 fixes to TACC (2026-10-29)
+
+`powersorter.py` (failed move logged as `fail`) and `url_gen.py` (`web_base` slash handling)
+were copied to `/corral-repl/projects/TORCH/tools/` after confirming the server copies were
+still byte-identical to the previous repo versions. Checksums of the deployed files match the
+repo. The previous versions are in `tools/backup_2026-10-29_fixes/`; roll back by copying them
+back. `rsync -t` could not set the modification time on the `brit`-owned `powersorter.py`
+(harmless, the content is written); use `rsync --inplace` without `-t` for those files.
+
+**TAES dry run** (`process.py -c config/TAES_v3.json -n`, run from a scratch directory,
+82 seconds, 51,241 input files): exit 0, 41,205 simulated moves, 10,036 would collide.
+- All 12,820 URLs now contain `/torch/TAES/` (the 2026-07-31 dry run had 0 of 12,820).
+- The 10,036 collisions are 2,509 catalog numbers x 4 file types (jpg, med, thumb, dng) that
+  are in staging and already exist in `web/TAES/` (seen in folders `TAES0309000` to
+  `TAES0313000`). Dry runs still log collisions as `success` so `url_gen` works, which is why
+  the URL file has 12,820 rows (10,311 new catalog numbers + 2,509 collisions). **A real run
+  would log those 2,509 as `fail` and emit URLs only for the 10,311 that actually move.**
+  Decide what to do with the 2,509 before a real run (overwrite with `-f`, or remove from
+  staging if they are duplicates).
+- The dry run wrote a 10 MB log to `archive/TAES/logs/TAES_ready_to_sort_2026-10-29T175645_DRY-RUN.csv`.
