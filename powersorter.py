@@ -67,8 +67,12 @@ def build_regex(catalog_number_regex=None, file_regex=None):
     Combine the catalog number and file regex into one case-insensitive pattern.
     The (?i) flag must be at the start of the whole expression (Python 3.11+),
     so any inline (?i) left in a config file is removed.
+    The pattern is anchored at the end (re.match only anchors the start), so a name
+    like BRIT123.jpg.bak does not match. Each part is wrapped in a non-capturing
+    group so an alternation in a config cannot escape the anchoring.
     """
-    return '(?i)' + catalog_number_regex.replace('(?i)', '') + file_regex.replace('(?i)', '')
+    return ('(?i)(?:' + catalog_number_regex.replace('(?i)', '') + ')'
+            '(?:' + file_regex.replace('(?i)', '') + r')\Z')
 
 def scan_files(path=None, pattern=None, file_type=None):
     """

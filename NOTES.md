@@ -39,7 +39,14 @@ Within each section, items are ordered roughly by importance.
    `HSU.json`, `HSU2.json` and `BRIT_v3_TACC.json` use the third form. Either fix
    `generate_url` to compute the path relative to `web_base` itself (stripping the
    trailing slash), or normalize all configs to `.../web/`. Doing both is best.
-4. **`file_regex` is not anchored at the end** (verified): `re.match` anchors only the
+4. **FIXED 2026-10-29** (`tests/test_build_regex.py`): `build_regex` now wraps each part in a
+   non-capturing group and appends `\Z`, so every caller (`scan_files`, `process.py`,
+   `url_gen.match_pattern`) is anchored without editing any config. Checked against all 21
+   v3 configs (only the `.jpg.bak` sample names changed) and against the real staging
+   directories on the server (about 59,500 files in 20 collections): no file dropped, none
+   changed file type. No `.bak`-style files are in staging today, so the fix is preventive.
+   Not yet deployed to the server.
+   Original description: **`file_regex` is not anchored at the end** (verified): `re.match` anchors only the
    start, so `BRIT123.jpgx` and `BRIT123.jpg.bak` match `web_jpg`. Add `$` to every
    `file_regex`, or use `re.fullmatch` in `scan_files` and `url_gen.match_pattern`.
 5. **`suffix` regex differences are dangerous (verified).** Configs with
@@ -233,7 +240,8 @@ differences into: only in repo, only on server, differs. Decide the canonical se
 
 ### Suggested order
 1. Data-correctness fixes: ~~1.1 (failed move logged as `success`)~~ done, ~~1.3 (`web_base`
-   trailing slash in `url_gen.generate_url`)~~ done, 1.4 (anchor `file_regex`).
+   trailing slash in `url_gen.generate_url`)~~ done, ~~1.4 (anchor `file_regex`)~~ done
+   (not yet deployed).
 2. Standardize configs (section 2, steps 1-4), using the server facts above.
 3. Add `config_check.py` and pytest tests, run against every config.
 4. `.gitignore`, `requirements.txt`, remove or archive the stray scripts.
