@@ -45,7 +45,7 @@ Within each section, items are ordered roughly by importance.
    v3 configs (only the `.jpg.bak` sample names changed) and against the real staging
    directories on the server (about 59,500 files in 20 collections): no file dropped, none
    changed file type. No `.bak`-style files are in staging today, so the fix is preventive.
-   Not yet deployed to the server.
+   Deployed to the server 2026-10-29 (section 8).
    Original description: **`file_regex` is not anchored at the end** (verified): `re.match` anchors only the
    start, so `BRIT123.jpgx` and `BRIT123.jpg.bak` match `web_jpg`. Add `$` to every
    `file_regex`, or use `re.fullmatch` in `scan_files` and `url_gen.match_pattern`.
@@ -241,7 +241,7 @@ differences into: only in repo, only on server, differs. Decide the canonical se
 ### Suggested order
 1. Data-correctness fixes: ~~1.1 (failed move logged as `success`)~~ done, ~~1.3 (`web_base`
    trailing slash in `url_gen.generate_url`)~~ done, ~~1.4 (anchor `file_regex`)~~ done
-   (not yet deployed).
+   (deployed).
 2. Standardize configs (section 2, steps 1-4), using the server facts above.
 3. Add `config_check.py` and pytest tests, run against every config.
 4. `.gitignore`, `requirements.txt`, remove or archive the stray scripts.
@@ -402,3 +402,9 @@ back. `rsync -t` could not set the modification time on the `brit`-owned `powers
   Decide what to do with the 2,509 before a real run (overwrite with `-f`, or remove from
   staging if they are duplicates).
 - The dry run wrote a 10 MB log to `archive/TAES/logs/TAES_ready_to_sort_2026-10-29T175645_DRY-RUN.csv`.
+
+**Anchored `file_regex` (1.4) deployed, same day:** `powersorter.py` copied to `tools/`
+after confirming the server copy was the previous repo version. Backup in
+`tools/backup_2026-10-29_anchor/`. The checksum matches the repo and `build_regex` imports and
+returns the anchored pattern under the server's Python 3.9.21. `process.py` and `url_gen.py`
+on the server already matched the repo. No dry run was done after this deploy.
