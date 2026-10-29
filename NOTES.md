@@ -549,3 +549,23 @@ scratch directory (removed afterwards; the real staging was not touched). Exit 0
 - The dry run left one log: `archive/WBU/logs/WBU-V-_wbu_dryrun_test_2026-10-29T181013_DRY-RUN.csv`
   (a dry-run log from this test, safe to delete).
 So the `WBU_v3.json` regex is now proven on the server. The 8 ` (2)` files still need renaming.
+
+### WBU catalog number counts (2026-10-29, read-only, from file names on the server)
+Distinct catalog numbers, not files: `_med`, `_thumb`, `_ocr` and suffixed variants (`_a`) are
+not counted separately.
+
+| Location | Unique catalog numbers |
+|---|---|
+| `web/WBU/WBU-V-00000/` | 326 (numbers 1 to 420) |
+| `archive/WBU/WBU-V-00000/` | 326 (numbers 1 to 420) |
+| Sorted, web or archive | 326 |
+| Staging, not sorted: `WBU-V-00261` to `00264` (the ` (2)` files) | 4 |
+| **Total** | **330** |
+
+- Web and archive agree exactly: every catalog number with a web image has a DNG and the
+  reverse, so nothing is half-sorted.
+- About 94 numbers between 1 and 420 do not exist (gaps are normal in this collection); the
+  four staged numbers fall in some of those gaps.
+- The orphan folder `web/WBU/WBU00000/` holds only `WBU-V-00001`, which is already in the 326.
+- Every file name in the sorted folders parsed against the WBU pattern.
+- Re-run this count after the ` (2)` files are sorted; the expected result is 330 sorted.
