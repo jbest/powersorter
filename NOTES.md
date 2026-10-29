@@ -333,9 +333,10 @@ local `config/` now agree on WBU.
 
 A dry run (`process.py -c config/WBU_v3.json -n -v`, using the real
 `staging/WBU/ready_to_sort/`) exited 0 with 0 files matched. That is correct: the only files
-there are 8 `WBU-V-0026x (2).JPG/.dng` files whose ` (2)` does not fit the pattern. They look
-like duplicates of images already sorted on 2026-08-07. This run therefore proves the config
-loads, not the regex; the regex was checked locally against sample names.
+there are 8 `WBU-V-0026x (2).JPG/.dng` files whose ` (2)` does not fit the pattern. They were first
+assumed to be duplicates of already-sorted images; the checksum check below showed they are not.
+This run therefore proves the config loads, not the regex; the regex was checked locally
+against sample names.
 
 **Decision: WBU keeps the `-V` in its prefix (`WBU-V-`).** Most collections do not put a
 collection code in the file name, but WBU is the Vascular collection and a lot has already
@@ -353,7 +354,8 @@ for the collection; do not revisit without a reason to renumber.
   imported, but that cannot be confirmed from the server. **Before removing the folder,
   check the Symbiota record for `WBU-V-00001` and make sure its images do not point at
   `.../WBU00000/...`.**
-- Decide what to do with the 8 ` (2)` files in staging (compare with the sorted copies first).
+- The 8 ` (2)` files in staging are NOT duplicates (see "WBU ` (2)` files" below). Decide how to
+  get them sorted.
 - Stale WBU logs in `archive/WBU/logs/` use prefixes `WBU_` (old config) and `WBU-V_`.
 
 ### New layout
@@ -483,8 +485,9 @@ files already imported into Symbiota.
 - **TAES:** 2,509 catalog numbers (10,036 files) in `staging/TAES/ready_to_sort/` already
   exist in `web/TAES/`. A real run now logs them as `fail` and emits no URL (section 8).
   Decide: overwrite with `-f`, or remove from staging after comparing with the sorted copies.
-- **WBU:** the orphan `web/WBU/WBU00000/` folder and the 8 ` (2)` files in staging
-  (section 7). Check Symbiota for `WBU-V-00001` before removing anything.
+- **WBU:** the orphan `web/WBU/WBU00000/` folder (section 7; check Symbiota for `WBU-V-00001`
+  before removing anything), and the 8 ` (2)` files in staging, which are the only copies of
+  `WBU-V-00261` to `00264` (section 10, "WBU ` (2)` files"). Do not delete them.
 - **OKL:** two folder schemes (section 9). Leave as is unless the URLs are renumbered.
 
 ### Remaining items from section 1
@@ -496,3 +499,21 @@ written to the current directory), 1.7 to 1.18 (see above). Section 4 steps 3 to
   umask for files written by different users has not been looked at.
 - Untracked laptop-only items from section 5 (`*_old.py`, `*CB*.py`, tarball, `env/`,
   `staging*/`) have still not been reviewed.
+
+### WBU ` (2)` files (checked 2026-10-29, read-only)
+`staging/WBU/ready_to_sort/Upload_3-24-26/` holds `WBU-V-00261 (2).JPG` and `.dng` through
+`WBU-V-00264 (2).JPG` and `.dng` (in the `02-19-2026_JPEG` and `02-19-2026_DNG` folders).
+They are **not** duplicates: no file with catalog number `00261` to `00264` exists anywhere under
+`web/WBU` or `archive/WBU`, and no WBU log from any run mentions them. The sorted set skips
+from `WBU-V-00260` straight to `WBU-V-00265`. These are the only copies of those four
+specimens' images, held back only because ` (2)` does not fit the file name pattern, so
+`process.py` skips them silently (NOTES 1.14).
+
+Checksums (md5, first 12 characters): 261 jpg `7c82ac8e1ac8`, dng `738e429840be`; 262 jpg
+`19985e138f76`, dng `826a4e258683`; 263 jpg `e668a24b24c7`, dng `992decb7f7e9`; 264 jpg
+`1119418483e2`, dng `643b60001e72`.
+
+To sort them, rename each to drop ` (2)` (for example `WBU-V-00261 (2).JPG` to
+`WBU-V-00261.JPG`; the sorted JPGs keep their upper-case `.JPG`) and run a dry run first. First
+confirm with whoever shot the batch that ` (2)` means "re-shot / second copy" and not a second
+image of the same specimen, which would need a suffix such as `_a` instead.
