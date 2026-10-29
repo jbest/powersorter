@@ -87,7 +87,11 @@ Within each section, items are ordered roughly by importance.
 
 ## 2. Config clean-up
 
-State of `config/` today (all are format `3.0`):
+> **Update 2026-10-29:** `config/` was renamed to `config_local_old/` and a new `config/`
+> now mirrors the TACC server (see section 7). The table below describes the old
+> directory, so every file name in it now lives in `config_local_old/`.
+
+State of the old config directory (all are format `3.0`):
 
 | Issue | Files |
 |---|---|
@@ -109,8 +113,8 @@ Suggested steps:
 1. **Decide the canonical TACC config per collection** and delete or move the rest to
    `config/old/`. `BRIT_v3.json`, `HSU.json`, `OKLA_v3.json`, `UOBS_v3.json` and
    `config_gen.py` were deliberately synced to the TACC server copies in commit `8baf0e8`,
-   so treat those server copies as the source of truth, and `WBU_v3.json` as a
-   known, intentional difference that has not been reconciled.
+   so treat those server copies as the source of truth. The one exception is
+   `WBU_v3.json`, where the server copy is the broken one (see section 7).
 2. **Standardize on `web_base: ".../web/"`** and `suffix` = `[a-z]|[0-9]`.
 3. **Check `number_pad` against each collection's real folder names on Corral.**
    Existing values differ (WBU 5, TTC 6, LLC/SRSC 8, others 7). A mismatch silently
@@ -185,8 +189,8 @@ Suggested steps:
   `/corral-repl/projects/TORCH/tools` (on `data.tacc.utexas.edu`).
 - No code fixes from section 1 have been made yet. The only code changes so far are
   `5a57d0b` (`build_regex`, dry-run and standalone bugs) and the regex fixes in `44ae309`.
-- `WBU_v3.json` differs from the server copy on purpose. The reason was not recorded, so
-  ask before changing it.
+- ~~`WBU_v3.json` differs from the server copy on purpose.~~ Corrected 2026-10-29: the
+  server copy is stale and broken, not a deliberate difference (see section 7).
 - Everything marked untracked in `git status` (CSV outputs, `env/`, `archive/`, `web/`,
   `input_dir/`, `*_old.py`, `*CB*.py`, `*_jb.py`, `url_gen_latest.py`, `url_gen_uknown.py`,
   `url_gen_old.py`, `check_permissions.py`, `config/WBU_v3_test.json`,
@@ -229,3 +233,91 @@ differences into: only in repo, only on server, differs. Decide the canonical se
 `log_directory_path` and needs that directory to exist and be writable.
 Remember to point `-i` at a scratch directory rather than the real `staging/` area when
 experimenting on TACC.
+
+## 6. Working on TACC from a Claude Code session (SSH control socket)
+
+TACC logins need a password plus an MFA token, which Claude Code cannot type. Claude Code's
+`!` shell has no terminal for prompts, so `ssh -fN` run there fails (it falls back to
+`ssh-askpass` and gets `Permission denied`). Instead, the user opens one authenticated
+connection in a separate terminal and Claude reuses it through an SSH control socket, so
+there is no second MFA prompt. Validated 2026-10-29.
+
+1. **In a separate terminal** (not the `!` prefix), log in and leave the session open:
+
+   ```bash
+   ssh -o ControlMaster=yes -o ControlPersist=2h \
+       -o ControlPath=/tmp/tacc-cm.sock jbest@data.tacc.utexas.edu
+   ```
+
+2. **Claude runs commands through the socket**, each as a short-lived connection:
+
+   ```bash
+   ssh -o ControlPath=/tmp/tacc-cm.sock -o BatchMode=yes jbest@data.tacc.utexas.edu '<command>'
+   rsync -av -e 'ssh -o ControlPath=/tmp/tacc-cm.sock' \
+       jbest@data.tacc.utexas.edu:/corral-repl/projects/TORCH/tools/ <local scratch dir>/
+   ```
+
+   `BatchMode=yes` makes a command fail immediately if the socket is gone, rather than
+   hanging on a prompt.
+3. **Ground rules**: read-only on Corral unless the user says otherwise. Pull copies into a
+   scratch directory outside the repo and diff them there.
+4. **Lifetime**: the socket exists only while the terminal session is connected (and up to
+   2 hours after it disconnects). Closing that terminal, or exiting the session, ends
+   Claude's access. The socket carries the user's authenticated access, so anyone with
+   access to `/tmp` on the machine could use it while open. Fine on a single-user laptop.
+5. **Fallback without a socket**: the user runs
+   `rsync -av jbest@data.tacc.utexas.edu:/corral-repl/projects/TORCH/tools/ <local dir>/`
+   themselves, and Claude diffs the local copy.
+
+## 7. Repo vs TACC comparison (2026-10-29)
+
+Compared against `/corral-repl/projects/TORCH/tools` on `data.tacc.utexas.edu`
+(read-only, via the SSH socket in section 6).
+
+### Scripts: identical
+`process.py`, `powersorter.py`, `url_gen.py` and `config_gen.py` are byte-identical to the
+server copies. Server-only top-level files: `requirements.txt` (stale, lists `Wand==0.6.3`
+although the code uses Pillow), `process_check.py`, `tacc_check.py`,
+`tacc_check_suffix_test.py`, `tacc_fix.py`. Also on the server: `env/` (venv), `backup_2026-10-22/`,
+`powersorter_update_2026-10-22.tar.gz`, many old `*_urls.csv` and `*_DRY-RUN*` outputs.
+
+### Configs
+The server has 26 top-level configs; the repo had 29. Of the overlap, 13 were identical
+(`BRIT_v3`, `DUR_v3`, `HSU`, `NOSU_v3`, `OCLA_v3`, `OCU_v3`, `OKLA_v3`, `OKL_v3`, `TTC_v3`,
+`UOBS_v3`, `UTPB_v3.0`, `WABA_v3`, `WOH_v3`) and one differed (`WBU_v3`).
+
+- **Server-only (12):** `ACU_GCP_ingest`, `BCNWR_v3`, `CHIC_v3`, `SAT_v3`, `TAC`, `TAES_v3`,
+  `TEST_v3`, `UTEP_GCP_ingest-TO-MODIFY`, `UTEP_TACC_staging-TO-MODIFY`, `UTPB_v3_WIP`,
+  `VDB_v3`, `WBU-V_v3`.
+- **Repo-only (14), now in `config_local_old/`:** `BRIT_v3.1`, `BRIT_v3_TACC`,
+  `BRIT_v3_TACC_old`, `BRIT_v3_BDI_local`, `BRIT_v3_mac_local`, `OKLA_v3_local`, `HSU2`,
+  `JAUM_v3`, `JAUM_v3_local`, `LLC_v3`, `LLC_v3_mac_local`, `SRSC_v3`, `WBU_vascular_v3`,
+  `config_gen_v3`.
+
+### WBU
+The earlier note that `WBU_v3.json` differed from the server on purpose was wrong. The server
+`WBU_v3.json` (2026-05-05) uses prefix `WBU` and the broken suffix group
+`(?P<suffix>a-z|0-9)` (matches the literal text "a-z") with an inline `(?i)`. The server
+`WBU-V_v3.json` (2026-08-07) has the same broken `file_regex` but a different, correct
+`catalog_number_regex` (`(?P<instID>WBU-V-)(?P<numerical>\d+)`).
+
+Decision: one WBU config only. The local `config/WBU_v3.json` takes the catalog regex from
+`WBU-V_v3.json` and the fixed `file_regex` values (`[a-z]|[0-9]`, no inline `(?i)`) from
+commit `44ae309`. `WBU-V_v3.json` was removed from the local `config/`. Tested against
+`WBU-V-123.jpg`, `_a.jpg`, `_med.jpg`, `_a_med.jpg`, `_thumb.jpg`, `.dng`, `_ocr.txt`.
+
+**Still to do on the server:** copy the new `WBU_v3.json` over the old one and remove
+`WBU-V_v3.json`, after backing both up and checking that nothing refers to
+`WBU-V_v3.json` by name.
+
+### New layout
+- `config/` mirrors the server's `tools/config/` exactly (45 files including `old/` and
+  `HSU.json.bak`), except for the fixed `WBU_v3.json` and the removed `WBU-V_v3.json`.
+- `config_local_old/` holds the previous repo `config/` (including the machine-specific
+  `*_local` configs) so nothing is lost.
+
+### Python on the server
+System `python3` is 3.9.21 with no Pillow. `tools/env` is a venv on Python 3.9.21 with
+Pillow 11.3.0. README and NOTES say 3.11+ is required for the regex handling. That claim is
+unverified: `build_regex` removes inline `(?i)` and puts one at the start, which also works
+on 3.9. Test under 3.9 before relying on either statement.

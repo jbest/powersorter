@@ -5,7 +5,7 @@
     "collection": {
         "name": "WBU",
         "prefix": "WBU-V-",
-        "catalog_number_regex": "(?P<catNum>(?P<instID>WBU)(-(?P<collID>V)-)(?P<numerical>\\d+))",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>WBU-V-)(?P<numerical>\\d+))",
         "web_base": "/corral-repl/projects/TORCH/web/WBU",
         "url_base": "https://web.corral.tacc.utexas.edu/torch/"
     },

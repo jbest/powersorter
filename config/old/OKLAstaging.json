@@ -1,0 +1,31 @@
+{
+    "collection": {
+        "name": "OKLA",
+        "prefix": "OKLA"
+     },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/OKLA/logs/",
+        "output_base_path": "/corral-repl/projects/TORCH/",
+        "input_path": "/corral-repl/projects/TORCH/staging/OKLA/TXmar13/"
+    },
+    "file_types": {
+        "web_jpg": {
+            "regex": "(?P<prefix>OKLA)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/OKLA/"
+        },
+        "web_derivs": {
+            "regex": "(?P<prefix>OKLA)(?P<numerical>\\d+)(?P<delimiter>_)(?P<size>med|thumb)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/OKLA/"
+        },
+        "archive_dng": {
+            "regex": "(?P<prefix>OKLA)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>DNG)",
+            "output_sub_path": "archive/OKLA/"
+        },
+        "ocr": {
+            "regex": "(?P<prefix>OKLA)(?P<numerical>\\d+)(?P<delimiter>_)(?P<ocr>ocr)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/OKLA/"
+        }
+    }
+}

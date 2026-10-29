@@ -1,0 +1,42 @@
+{
+    "versions": {
+        "config_format": "3.0"
+    },
+    "collection": {
+        "name": "TEST",
+        "prefix": "TEST",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>BRIT)(-(?P<collID>[A-Z])-)?(?P<numerical>\\d+))",
+        "web_base": "/corral-repl/projects/TORCH/web/",
+        "url_base": "https://web.corral.tacc.utexas.edu/torch/"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/TEST/logs/",
+        "output_base_path": "/corral-repl/projects/TORCH/",
+        "input_path": "/corral-repl/projects/TORCH/staging/TEST/ready_to_sort"
+
+    },
+    "file_types": {
+        "web_jpg": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "output_sub_path": "web/TEST/"
+        },
+        "web_jpg_med": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "output_sub_path": "web/TEST/"
+        },
+        "web_jpg_thumb": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "output_sub_path": "web/TEST/"
+        },
+        "archive_dng": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>dng)(?i)",
+            "output_sub_path": "archive/TEST/"
+        },
+        "ocr": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_ocr)(\\.)(?P<ext>txt|json)(?i)",
+            "output_sub_path": "web/TEST/"
+        }
+    }
+}

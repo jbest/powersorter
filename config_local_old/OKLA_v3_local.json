@@ -1,0 +1,41 @@
+{
+    "versions": {
+        "config_format": "3.0"
+    },
+    "collection": {
+        "name": "OKLA",
+        "prefix": "OKLA",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>OKLA)(-(?P<collID>[A-Z])-)?(?P<numerical>\\d+))",
+        "web_base": "/media/jbest/data3/BRIT_git/powersorter/web",
+        "url_base": "https://web.corral.tacc.utexas.edu/torch/"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/media/jbest/data3/BRIT_git/powersorter/",
+        "output_base_path": "/media/jbest/data3/BRIT_git/powersorter/",
+        "input_path": "/media/jbest/data3/BRIT_git/powersorter/staging_OKLA/"
+    },
+    "file_types": {
+        "web_jpg": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/OKLA/"
+        },
+        "web_jpg_med": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/OKLA/"
+        },
+        "web_jpg_thumb": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/OKLA/"
+        },
+        "archive_dng": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(\\.)(?P<ext>dng)",
+            "output_sub_path": "archive/OKLA/"
+        },
+        "ocr": {
+            "file_regex": "(_(?P<suffix>[A-Z]|[a-z]|[0-9]))?(_ocr)(\\.)(?P<ext>txt|json)",
+            "output_sub_path": "web/OKLA/"
+        }
+    }
+}

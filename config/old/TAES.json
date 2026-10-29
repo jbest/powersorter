@@ -1,0 +1,41 @@
+{
+    "versions": {
+        "config_format": "3.0"
+    },
+    "collection": {
+        "name": "TAES",
+        "prefix": "TAES",
+        "catalog_number_regex": "(?P<catNum>(?P<instID>TAES)(-(?P<collID>[A-Z])-)?(?P<numerical>\\d+))",
+        "web_base": "/corral-repl/projects/TORCH/web/TAES/",
+        "url_base": "https://web.corral.tacc.utexas.edu/torch/"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/TAES/logs/",
+        "output_base_path": "/corral-repl/projects/TORCH/",
+        "input_path": "/corral-repl/projects/TORCH/staging/TAES/nfn/"
+    },
+    "file_types": {
+        "web_jpg": {
+            "file_regex": "(_(?P<suffix>[A-Z|a-z|0-9]))?(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "output_sub_path": "web/TAES/"
+        },
+        "web_jpg_med": {
+            "file_regex": "(_(?P<suffix>[A-Z|a-z|0-9]))?(_)(?P<size>med)(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "output_sub_path": "web/TAES/"
+        },
+        "web_jpg_thumb": {
+            "file_regex": "(_(?P<suffix>[A-Z|a-z|0-9]))?(_)(?P<size>thumb)(\\.)(?P<ext>jpg|jpeg)(?i)",
+            "output_sub_path": "web/TAES/"
+        },
+        "archive_dng": {
+            "file_regex": "(_(?P<suffix>[A-Z|a-z|0-9]))?(\\.)(?P<ext>dng)(?i)",
+            "output_sub_path": "archive/TAES/"
+        },
+        "ocr": {
+            "file_regex": "(_(?P<suffix>[A-Z|a-z|0-9]))?(_ocr)(\\.)(?P<ext>txt|json)(?i)",
+            "output_sub_path": "web/TAES/"
+        }
+    }
+}

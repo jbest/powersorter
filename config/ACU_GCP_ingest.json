@@ -1,0 +1,31 @@
+{
+    "collection": {
+        "name": "ACU",
+        "prefix": "ACU"
+    },
+    "files": {
+        "folder_increment": 1000,
+        "number_pad": 7,
+        "log_directory_path": "/corral-repl/projects/TORCH/archive/ACU/logs/",
+        "output_base_path": "/corral-repl/projects/TORCH/",
+        "input_path": "/corral-repl/projects/TORCH/tools/ingest/ACU"
+    },
+    "file_types": {
+        "web_jpg": {
+            "regex": "(?P<prefix>ACU)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>jpg|jpeg)",
+            "output_sub_path": "web/ACU/"
+        },
+        "web_derivs": {
+            "regex": "(?P<prefix>ACU)(?P<numerical>\\d+)(?P<delimiter>_)(?P<size>med|thumb)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/ACU/"
+        },
+        "archive_dng": {
+            "regex": "(?P<prefix>ACU)(?P<numerical>\\d+)(\\.)(?i)(?P<ext>DNG)",
+            "output_sub_path": "archive/ACU/"
+        },
+        "ocr": {
+            "regex": "(?P<prefix>ACU)(?P<numerical>\\d+)(?P<delimiter>_)(?P<ocr>ocr)(\\.)(?P<ext>.+)",
+            "output_sub_path": "web/ACU/"
+        }
+    }
+}
