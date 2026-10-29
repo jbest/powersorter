@@ -569,3 +569,42 @@ not counted separately.
 - The orphan folder `web/WBU/WBU00000/` holds only `WBU-V-00001`, which is already in the 326.
 - Every file name in the sorted folders parsed against the WBU pattern.
 - Re-run this count after the ` (2)` files are sorted; the expected result is 330 sorted.
+
+### Config fixes: NOSU, OCLA, OCU, WOH, WABA (details; not started)
+Evidence is from the read-only audit in section 9 (folder names on the server) and the staging
+check in section 1.4's verification. Nothing has been changed or deployed; the repo and server
+configs still have the old values.
+
+**NOSU, OCLA, OCU, WOH: `prefix` is missing the hyphen.** Catalog numbers are hyphenated
+(`NOSU-0000001.jpg`) and the existing folders are `NOSU-0000000`, `OCLA-0000000`,
+`OCU-0000000` and `WOH-0000000`, but each config has `prefix` without the hyphen. The folder
+name is `prefix + zero-padded number`, so a real run would create `NOSU0000000` and so on, a
+second parallel folder set next to the existing one. Files would still sort and get URLs, but
+the collection would be split across two naming schemes.
+- Change `prefix` to `NOSU-`, `OCLA-`, `OCU-`, `WOH-`. `number_pad: 7` is already correct.
+- Existing numbered folders: NOSU 4, OCLA 20, OCU 2, WOH 15 (each under both `web/` and `archive/`).
+- Staging for these four was empty when checked, so nothing is waiting.
+
+**WABA: `number_pad` is wrong (the prefix is fine).** The one existing folder is
+`web/WABA/WABA000000` (6 digits, 1,368 files) and `archive/WABA/WABA000000`. The config has
+`number_pad: 7`, which would create `WABA0000000`.
+- Change `number_pad` to `6`.
+- **Urgent:** 164 files are in `staging/OKL/WABA_ready_to_process/` and all match the pattern.
+  A real WABA run before this is fixed would create the wrong folder at once.
+
+**Side effects to expect:**
+- The sort logs are named `<prefix>_<input dir>_<timestamp>`, so these logs will start with
+  `NOSU-_...`. Cosmetic; WBU already does the same (`WBU-V-_...`).
+- Which Symbiota records point at which folder has not been checked (section 9).
+
+**Order of work:**
+1. Check in Symbiota that existing records for NOSU, OCLA, OCU, WOH and WABA point at the
+   hyphenated or 6-digit folders (the fix makes new sorts land in those existing folders).
+2. Edit the five configs in `config/` and commit.
+3. Add a test that, for every config, builds the folder name for a sample catalog number and
+   compares it with the real folder names listed from the server (a stored snapshot), so this
+   kind of mismatch fails a test instead of needing an audit (NOTES 2.7 and 2.8).
+4. Deploy the five configs to `tools/config/` with a backup first (same method as section 8).
+5. Dry run each (`-n -v`). For WABA use the real staging directory; for the other four use
+   test files in a scratch directory with `-i`, as in the WBU dry run above.
+6. Record the result here.
